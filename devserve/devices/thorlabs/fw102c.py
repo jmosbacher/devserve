@@ -164,6 +164,7 @@ class FW102C(Device):
         ans = self.query(cmd+'?')
         #print 'ans=',repr(ans),cmd+'?'
         return ans
+        
     # end def command
     @property
     def info(self):

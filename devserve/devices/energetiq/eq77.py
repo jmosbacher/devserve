@@ -9,9 +9,11 @@ class EQ77(Device):
     public = ['power', 'connected', 'port']
 
     def query(self, q):
+        if q not in ['U','D','Q']:
+            return ''
         self.conn.write(q.encode())
-        res = self.conn.readlines(2048)[-1].strip()
-        return res.split(b' = ')[-1].decode()
+        res = self.conn.read(2048)
+        return float(res.decode().strip().split(' = ')[-1].replace('%',''))
 
     @property
     def power(self):
@@ -21,19 +23,17 @@ class EQ77(Device):
     def power(self, pwr):
         pwr = int(pwr)
         if pwr>100 or pwr<15:
-            return 'Requested power out of range 15-100'
-        
+            return
+        p = self.power
         while True:
-            p = self.power
             if p==pwr:
-                return f'Power now at {pwr}%'
+                break
             elif p>pwr:
-                self.query('D')
+                p = self.query('D')
             elif p<pwr:
-                self.query('U')
+                p = self.query('U')
             time.sleep(0.2)
 
-        
     def connect(self):
         try:
             self.conn = RS485(self._port, baudrate=9600, timeout=1)
