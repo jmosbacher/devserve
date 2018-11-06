@@ -66,7 +66,7 @@ try:
             if pos in Position.__members__:
                 cmd = Position[pos].value
                 if cmd:
-                self.motor.write(cmd)
+                    self.motor.write(cmd)
 
         @property
         def info(self):
