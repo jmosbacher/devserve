@@ -1,11 +1,10 @@
 from flask import Flask, url_for
 
 from flask_restful import reqparse, abort, Api, Resource
-import argparse
-import sys
 import redis
 rparser = reqparse.RequestParser()
 rparser.add_argument('value')
+
 
 class DeviceServer:
 
@@ -18,15 +17,16 @@ class DeviceServer:
     def run(self, debug=False):
         app = Flask(__name__)
         api = Api(app)
+
         class RestfulDevice(Resource):
             dev = self.device
             
             def get(self, ep):
                 if ep in self.dev.public:
                     resp = getattr(self.dev, ep)
+                    return {ep: resp}
                 else:
-                    resp = f'No attribute named {ep}'
-                return {ep: resp}
+                    abort(f'No attribute named {ep}')
                 
             def put(self, ep):
                 if ep in self.dev.public:
@@ -34,12 +34,12 @@ class DeviceServer:
                     val = args['value']
                     try:
                         setattr(self.dev, ep, val)
-                        resp = f'{ep} set to {val}'
+                        return {ep: val}, 201
                     except:
-                        resp = f'{ep} is not writable.'
+                        abort(f'{ep} is not writable.')
                 else:
-                    resp = f'No attribute named {ep}'        
-                return {ep: resp}, 201
+                    abort(f'No attribute named {ep}')
+
 
         api.add_resource(RestfulDevice, f'/{self.name}/<ep>')
 
