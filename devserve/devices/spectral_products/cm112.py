@@ -7,6 +7,14 @@ from ..device import Device
 
 class CM112(Device):
     public = ['wavelength', 'grating', 'port', 'connected']
+
+    def __init__(self, port):
+        self._port = port
+        try:
+            self.connect()
+        except:
+            self.conn = None
+
     @staticmethod
     def wl_to_bytes(wl):
         a = wl*10.
@@ -16,12 +24,12 @@ class CM112(Device):
 
     @staticmethod
     def encode(*args):
-        return b''.join([struct.pack('B',arg) for arg in args])
+        return b''.join([struct.pack('B', arg) for arg in args])
 
     def query(self, *args):
         msg = self.encode(*args)
         self.conn.write(msg)
-        return self.conn.read(2048)
+        return list(self.conn.read(2048))
     
     def home(self):
         self.query(255,255,255)
@@ -43,19 +51,20 @@ class CM112(Device):
                 time.sleep(0.5)
     @property
     def grating(self):
-        h,l = self.query(56,4)
+        h,l = self.query(56, 4)
         return l
 
     @grating.setter
-    def grating(self,gr):
+    def grating(self, gr):
         if gr not in [1,2]:
-            return 'Invalid grating number (must be 1 or 2)'
+            return
         while True:
             if self.grating==gr:
                 break
             else:
-                self.query(26,gr)
+                self.query(26, gr)
                 time.sleep(4)
+
     @property
     def port(self):
         return self._port
@@ -76,18 +85,13 @@ class CM112(Device):
     @property
     def connected(self):
         if self.conn:
-            return self.conn.is_open()
+            return self.conn.is_open
         return False
 
     def disconnect(self):
         if self.connected:
             self.conn.close()
 
-    def __init__(self, port):
-        self._port = port
-        try:
-            self.connect()
-        except:
-            self.conn = None
+
         
 # device_directory['CM112'] = CM112

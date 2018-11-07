@@ -40,7 +40,6 @@ class DeviceServer:
                 else:
                     abort(f'No attribute named {ep}')
 
-
         api.add_resource(RestfulDevice, f'/{self.name}/<ep>')
 
         @app.route(f'/{self.name}/attributes')

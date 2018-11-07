@@ -43,7 +43,7 @@ class EQ77(Device):
     @property
     def connected(self):
         if self.conn:
-            return self.conn.is_open()
+            return self.conn.is_open
         return False
 
     def disconnect(self):

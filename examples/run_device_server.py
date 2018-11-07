@@ -16,11 +16,11 @@ if __name__ == '__main__':
                 help='Device name, must be unique.')
     parser.add_argument('-COM', '--COM', dest='com', default=1,type=int,
                 help='Serial port.')
-    parser.add_argument('-HOST','--HOST',dest='host',default='localhost',
+    parser.add_argument('-HOST', '--HOST',dest='host',default='localhost',
                 help='IP to serve on.')
-    parser.add_argument('-PORT','--PORT',dest='port', type=int, default=5000,
+    parser.add_argument('-PORT', '--PORT',dest='port', type=int, default=5000,
             help='Port to open.')
-    parser.add_argument('-DEBUG','--DEBUG', action='store_const', dest='debug',
+    parser.add_argument('-DEBUG', '--DEBUG', action='store_const', dest='debug',
                 const=True, default=False, help='Run server in debug mode.')
     kwargs = vars(parser.parse_args())
     device = kwargs['device']

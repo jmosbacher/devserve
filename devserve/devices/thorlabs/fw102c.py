@@ -53,7 +53,7 @@ class FW102C(Device):
         self._port = port
         self._fw = None
         self.connect()
-        print( self.info)
+        print(self.info)
         if self.connected:
             self._sio.write(u'pos?\r')
             self.pos = self._sio.readlines(2048)[1][:-1]
@@ -74,7 +74,7 @@ class FW102C(Device):
             self.baud = self._sio.readlines(2048)[1][:-1]
             if self.baud: self.baud = 115200
             else: self.baud = 9600
-            print(', baud=',self.baud)
+            print(', baud=', self.baud)
             self._sio.flush()
         
     # end def __init__
@@ -94,7 +94,7 @@ class FW102C(Device):
     @property
     def connected(self):
         if self._fw is not None:
-            return self._fw.is_open()
+            return self._fw.is_open
         return False
 
     def connect(self):
