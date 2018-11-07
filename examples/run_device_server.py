@@ -14,7 +14,7 @@ if __name__ == '__main__':
                 choices=device_names, help=f'Device to control. Default is: Echo.')
     parser.add_argument('-NAME', '--NAME', dest='name', default='dev',
                 help='Device name, must be unique.')
-    parser.add_argument('-COM', '--COM', dest='com', default=1,
+    parser.add_argument('-COM', '--COM', dest='com', default='COM1',
                 help='Serial port.')
     parser.add_argument('-HOST', '--HOST',dest='host',default='localhost',
                 help='IP to serve on.')
