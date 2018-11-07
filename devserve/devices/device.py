@@ -1,6 +1,8 @@
 
 class Device:
+
     public = ['connected']
+
     def __init__(self, *args, **kwargs):
         pass
 
