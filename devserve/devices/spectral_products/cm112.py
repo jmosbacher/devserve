@@ -36,7 +36,7 @@ class CM112(Device):
 
     @property
     def wavelength(self):
-        h,l = self.query(56,0)
+        h, l, *_ = self.query(56,0)
         return (h*256+l)/10
 
     @wavelength.setter 
@@ -45,13 +45,13 @@ class CM112(Device):
         while True:
             cwl = self.wavelength
             if abs(wl - cwl)<1:
-                return 
+                break
             else:
                 self.query(16, high, low)
-                time.sleep(0.5)
+                time.sleep(0.1)
     @property
     def grating(self):
-        h,l = self.query(56, 4)
+        h,l, *_ = self.query(56, 4)
         return l
 
     @grating.setter
@@ -80,7 +80,7 @@ class CM112(Device):
             pass
 
     def connect(self):
-        self.conn  = serial.Serial(self._port, baudrate=9600, timeout=1)
+        self.conn = serial.Serial(self._port, baudrate=9600, timeout=1)
 
     @property
     def connected(self):
