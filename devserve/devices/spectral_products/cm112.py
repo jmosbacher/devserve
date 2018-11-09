@@ -2,7 +2,6 @@ import serial
 import struct
 import time
 from ..device import Device
-# from .. import device_directory
 
 
 class CM112(Device):
@@ -93,5 +92,3 @@ class CM112(Device):
             self.conn.close()
 
 
-        
-# device_directory['CM112'] = CM112

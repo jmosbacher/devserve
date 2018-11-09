@@ -8,11 +8,12 @@ rparser.add_argument('value')
 
 class DeviceServer:
 
-    def __init__(self, name, host, port, device):
+    def __init__(self, name, host, port, device, rs=None):
         self.name = name
         self.host = host
         self.port = port
         self.device = device
+        self.rs = rs
         
     def run(self, debug=False):
         app = Flask(__name__)
@@ -45,13 +46,18 @@ class DeviceServer:
         @app.route(f'/{self.name}/attributes')
         def attributes():
             return "\n".join(RestfulDevice.dev.public)
-        rs = redis.Redis("localhost")
+
         try:
+            if self.rs is not None:
+                self.rs.set(self.name, f'{self.host}:{self.port}')
             app.run(host=self.host, port=self.port, debug=debug)
-            rs.set(self.name, f'{self.host}:{self.port}')
+            if self.rs is not None:
+                self.rs.delete(self.name)
+
         except KeyboardInterrupt:
             pass
         finally:
             if RestfulDevice.dev.connected:
                 RestfulDevice.dev.disconnect()
-            rs.delete(self.name)
+
+
