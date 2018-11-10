@@ -19,13 +19,15 @@ class DeviceServer:
         app = Flask(__name__)
         api = Api(app)
 
+        self.device.connect()
+
         class RestfulDevice(Resource):
             dev = self.device
             
             def get(self, ep):
                 if ep in self.dev.public:
-                    resp = getattr(self.dev, ep)
-                    return {ep: resp}
+                    val = getattr(self.dev, ep)
+                    return {"name":ep, "value" : val}
                 else:
                     abort(f'No attribute named {ep}')
                 
@@ -35,7 +37,7 @@ class DeviceServer:
                     val = args['value']
                     try:
                         setattr(self.dev, ep, val)
-                        return {ep: val}, 201
+                        return {"name":ep, "value" : val}, 201
                     except:
                         abort(f'{ep} is not writable.')
                 else:
