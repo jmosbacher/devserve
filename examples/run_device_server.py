@@ -11,8 +11,8 @@ if __name__ == '__main__':
     device_names = list(device_directory.keys())
     device_names_str = ",".join(device_names)
     parser = argparse.ArgumentParser(description='Start an device webserver.')
-    parser.add_argument('-DEVICE', '--DEVICE', dest='device', default='Echo',
-                choices=device_names, help=f'Device to control. Default is: Echo.')
+    parser.add_argument('-DEVICE', '--DEVICE', dest='device', default='Debugger',
+                choices=device_names, help=f'Device to control. Default is: Debugger.')
     parser.add_argument('-NAME', '--NAME', dest='name', default='dev',
                 help='Device name, must be unique.')
     parser.add_argument('-COM', '--COM', dest='com', default='COM1',

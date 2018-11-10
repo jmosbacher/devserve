@@ -1,3 +1,5 @@
+import random
+
 
 class Device:
 
@@ -18,10 +20,10 @@ class Device:
     def __exit__(self, exc_type, exc_value, traceback):
         self.disconnect()
 
-class Echo(Device):
-    public = ['echo','connected']
+class Debugger(Device):
+    public = ['echo','random','connected']
     connected = True
-    _echo = ''
+    _echo = 'echo'
     
     @property
     def echo(self):
@@ -31,10 +33,14 @@ class Echo(Device):
     def echo(self, value):
         self._echo = value
 
+    @property
+    def random(self):
+        return random.random()
+
     def connect(self):
         pass
 
     def disconnect(self):
         pass
 
-    
+
