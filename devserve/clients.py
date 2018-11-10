@@ -1,23 +1,36 @@
 import requests
+import ast
 
 class DeviceClient:
-
+    _addr = ''
     def __init__(self, addr):
         self._addr = addr
 
     def __getattr__(self, item):
-        resp = requests.get('{addr}/{item}'.format(addr=self._addr, item=item).replace('//','/'))
-        if resp.ok:
-            return resp.json()['value']
-        else:
-            raise AttributeError('Attribute {} is not available'.format( item))
+        try:
+            resp = requests.get('{addr}/{item}'.format(addr=self._addr, item=item))
+            if resp.ok:
+                try:
+                    val = ast.literal_eval(resp.json()['value'])
+                except:
+                    val = resp.json()['value']
+                return val
+        except:
+            raise AttributeError('Device address unavailable.')
+        raise AttributeError('Attribute {} is not available'.format( item))
 
     def __setattr__(self, key, value):
-        resp = requests.put('{addr}/{key}'.format(addr=self._addr, key=key).replace('//','/'), data={"value": value})
-        if resp.ok:
-            return resp.json()['value']
+        if key == '_addr':
+            super().__setattr__(key, value)
         else:
-            raise AttributeError('Attribute {} is not available'.format(key))
+            try:
+                resp = requests.put('{addr}/{key}'.format(addr=self._addr, key=key), data={"value": value})
+                if resp.ok:
+                    return
+                else:
+                    raise 'Bad response from server code: {}'.format(resp.status_code)
+            except:
+                raise AttributeError('Server unavailable.')
 
 class SystemClient:
 
