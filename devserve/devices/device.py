@@ -13,7 +13,8 @@ class Device:
 
     def disconnect(self):
         raise NotImplementedError
-
+    
+    @property
     def attributes(self):
         return self.public
 
