@@ -34,7 +34,7 @@ try:
             super().__init__()
             self._port = port.encode()
             self.motor = None
-            self.connect()
+
 
 
         def connected(self):

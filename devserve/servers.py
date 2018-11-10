@@ -2,6 +2,7 @@ from flask import Flask, url_for
 
 from flask_restful import reqparse, abort, Api, Resource
 import redis
+import ast
 rparser = reqparse.RequestParser()
 rparser.add_argument('value')
 
@@ -34,7 +35,10 @@ class DeviceServer:
             def put(self, ep):
                 if ep in self.dev.public:
                     args = rparser.parse_args()
-                    val = args['value']
+                    try:
+                        val = ast.literal_eval(args['value'])
+                    except:
+                        val = args['value']
                     try:
                         setattr(self.dev, ep, val)
                         return {"name":ep, "value" : val}, 201

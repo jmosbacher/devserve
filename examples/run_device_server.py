@@ -25,20 +25,24 @@ if __name__ == '__main__':
                 const=True, default=False, help='Run server in debug mode.')
     parser.add_argument('-REDIS', '--REDIS', action='store_const', dest='set_redis',
                         const=True, default=False, help='Set address in redis.')
+    parsed, unknown = parser.parse_known_args()  # this is an 'internal' method
+    # which returns 'parsed', the same as what parse_args() would return
+    # and 'unknown', the remainder of that
+    # the difference to parse_args() is that it does not exit when it finds redundant arguments
 
-    kwargs = vars(parser.parse_args())
-    device = kwargs['device']
-    name = kwargs['name']
-    host = kwargs['host']
-    port = kwargs['port']
-    com = kwargs['com']
-    debug = kwargs['debug']
-    if kwargs['set_redis']:
+    for arg in unknown:
+        if arg.startswith(("-", "--")):
+            # you can pass any arguments to add_argument
+            parser.add_argument(arg,)
+
+    a = parser.parse_args()
+
+    if a.set_redis:
         import redis
         rs = redis.Redis("localhost")
     else:
         rs = None
 
-    device = device_directory[device](f'{com}')
-    server = DeviceServer(name, host, port, device, rs)
-    server.run(debug=debug)
+    device = device_directory[a.device](f'{a.com}')
+    server = DeviceServer(a.name, a.host, a.port, device, rs)
+    server.run(debug=a.debug)

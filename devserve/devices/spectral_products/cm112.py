@@ -10,10 +10,7 @@ class CM112(Device):
     def __init__(self, port):
         super().__init__()
         self._port = port
-        try:
-            self.connect()
-        except:
-            self.conn = None
+        self.conn = None
 
     @staticmethod
     def wl_to_bytes(wl):

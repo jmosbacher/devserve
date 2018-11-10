@@ -53,7 +53,7 @@ class FW102C(Device):
         super().__init__()
         self._port = port
         self._fw = None
-        self.connect()
+
         print(self.info)
         if self.connected:
             self._sio.write(u'pos?\r')
