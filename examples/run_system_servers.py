@@ -30,6 +30,7 @@ for i, cfg in enumerate(cfgs):
 
     except:
         pass
+
 try:
     while True:
         time.sleep(0.5)
