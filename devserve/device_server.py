@@ -47,7 +47,7 @@ class DeviceServer:
 
         @app.route(f'/{self.name}/attributes')
         def attributes():
-            return "\n".join(RestfulDevice.dev.public)
+            return f"Device: {self.name}, Attributes: "+", ".join(RestfulDevice.dev.public)
 
         try:
             if self.rs is not None:
