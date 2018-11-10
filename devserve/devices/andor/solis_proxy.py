@@ -16,7 +16,21 @@ class SolisProxy(Device):
         self._path ='not_saved'
         self._running = False
         self.conn = None
-        
+
+    @property
+    def port(self):
+        return self._port
+
+    @port.setter
+    def port(self, value):
+        self._port = value
+        if self.connected:
+            self.disconnect()
+        try:
+            self.connect()
+        except:
+            pass
+
     @property
     def save(self):
         return self._path
@@ -43,7 +57,10 @@ class SolisProxy(Device):
             self.conn.write(b'Run\r')
 
     def connect(self):
-        self.conn = serial.Serial(self._port, baudrate=9600, timeout=1)
+        try:
+            self.conn = serial.Serial(self._port, baudrate=9600, timeout=1)
+        except:
+            pass
 
     @property
     def connected(self):

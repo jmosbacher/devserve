@@ -54,43 +54,22 @@ class FW102C(Device):
         self._port = port
         self._fw = None
 
-        print(self.info)
-        if self.connected:
-            self._sio.write(u'pos?\r')
-            self.pos = self._sio.readlines(2048)[1][:-1]
-            print(  'position=',self.pos,)
-            self._sio.write(u'pcount?\r')
-            self.pcount = self._sio.readlines(2048)[1][:-1]
-            print(', pcount=',self.pcount,)
-            self._sio.write(u'trig?\r')
-            self.trig = self._sio.readlines(2048)[1][:-1]
-            print(', trig=',self.trig,)
-            self._sio.write(u'speed?\r')
-            self.speed = self._sio.readlines(2048)[1][:-1]
-            print(', speed=',self.speed,)
-            self._sio.write(u'sensors?\r')
-            self.sensors = self._sio.readlines(2048)[1][:-1]
-            print(', sensors=',self.sensors,)
-            self._sio.write(u'baud?\r')
-            self.baud = self._sio.readlines(2048)[1][:-1]
-            if self.baud: self.baud = 115200
-            else: self.baud = 9600
-            print(', baud=', self.baud)
-            self._sio.flush()
-        
-    # end def __init__
-    
     def help(self):
         print( self.__doc__)
 
     @property
     def port(self):
         return self._port
-    
+
     @port.setter
     def port(self, value):
         self._port = value
-        self.connect()
+        if self.connected:
+            self.disconnect()
+        try:
+            self.connect()
+        except:
+            pass
 
     @property
     def connected(self):
@@ -103,16 +82,17 @@ class FW102C(Device):
             self._fw = serial.Serial(port=self.port, baudrate=115200,
                                   bytesize=8, parity='N', stopbits=1,
                                   timeout=1, xonxoff=0, rtscts=0)
+            self._sio = io.TextIOWrapper(io.BufferedRWPair(self._fw, self._fw, 1),
+                                         newline=None, encoding='ascii')
+            self._sio.write(u'*idn?\r')
+            self.devInfo = self._sio.readlines(2048)[1][:-1]
+
         except  serial.SerialException as ex:
             print( 'Port {0} is unavailable: {1}'.format(self.port, ex))
             return
         except  OSError as ex:
             print( 'Port {0} is unavailable: {1}'.format(self.port, ex))
             return
-        self._sio = io.TextIOWrapper(io.BufferedRWPair(self._fw, self._fw, 1),
-                       newline=None, encoding='ascii')
-        self._sio.write(u'*idn?\r')
-        self.devInfo = self._sio.readlines(2048)[1][:-1]
 
     def disconnect(self):
         if not self.connected:

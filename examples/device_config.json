@@ -1,0 +1,44 @@
+[
+  {
+    "name": "debug",
+    "device": "Debugger",
+    "com": "COM1"
+  },
+
+  {
+    "name": "mono",
+    "device": "CM112",
+    "com": "COM1"
+  },
+
+  {
+    "name": "spectro",
+    "device": "SolisProxy",
+    "com": "COM7"
+  },
+
+  {
+    "name": "source",
+    "device": "EQ77",
+    "com": "COM1"
+  },
+
+  {
+    "name": "lpfw",
+    "device": "FW102",
+    "com": "COM1"
+  },
+
+  {
+    "name": "spfw",
+    "device": "FW102",
+    "com": "COM1"
+  },
+
+  {
+    "name": "flipper",
+    "device": "MFF101",
+    "com": "COM1"
+  }
+
+]

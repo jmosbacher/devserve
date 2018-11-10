@@ -77,7 +77,10 @@ class CM112(Device):
             pass
 
     def connect(self):
-        self.conn = serial.Serial(self._port, baudrate=9600, timeout=1)
+        try:
+            self.conn = serial.Serial(self._port, baudrate=9600, timeout=1)
+        except:
+            pass
 
     @property
     def connected(self):

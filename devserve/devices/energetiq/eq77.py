@@ -61,8 +61,12 @@ class EQ77(Device):
     @port.setter
     def port(self, value):
         self._port = value
-        self.connect()
-
+        if self.connected:
+            self.disconnect()
+        try:
+            self.connect()
+        except:
+            pass
 
         
 # device_directory['EQ77'] = EQ77

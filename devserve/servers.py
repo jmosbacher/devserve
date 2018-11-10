@@ -20,7 +20,7 @@ class DeviceServer:
         app = Flask(__name__)
         api = Api(app)
 
-        self.device.connect()
+
 
         class RestfulDevice(Resource):
             dev = self.device
@@ -50,6 +50,7 @@ class DeviceServer:
         api.add_resource(RestfulDevice, f'/{self.name}/<ep>')
 
         try:
+            self.device.connect()
             if self.rs is not None:
                 self.rs.set(self.name, f'{self.host}:{self.port}')
             app.run(host=self.host, port=self.port, debug=debug)
@@ -58,6 +59,11 @@ class DeviceServer:
 
         except KeyboardInterrupt:
             pass
+        except Exception as e:
+            if debug:
+                print(e)
+            else:
+                print('Exception raised. Closing down gracefully...')
         finally:
             if RestfulDevice.dev.connected:
                 RestfulDevice.dev.disconnect()
