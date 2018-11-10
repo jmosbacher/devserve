@@ -27,13 +27,15 @@ try:
     import ftd2xx
     import ftd2xx.defines as constants
     class MFF101(Device):
-        public = ['position', 'info','port', 'connected']
+        public = ['position', 'info', 'port']
         # Raw byte commands for "MGMSG_MOT_MOVE_JOG".
 
         def __init__(self, port="37000021"):
+            super().__init__()
             self._port = port.encode()
             self.motor = None
             self.connect()
+
 
         def connected(self):
             if self.motor is None:

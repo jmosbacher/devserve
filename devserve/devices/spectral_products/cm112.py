@@ -5,9 +5,10 @@ from ..device import Device
 
 
 class CM112(Device):
-    public = ['wavelength', 'grating', 'port', 'connected']
+    public = ['wavelength', 'grating', 'port']
 
     def __init__(self, port):
+        super().__init__()
         self._port = port
         try:
             self.connect()

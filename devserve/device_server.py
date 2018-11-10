@@ -45,10 +45,6 @@ class DeviceServer:
 
         api.add_resource(RestfulDevice, f'/{self.name}/<ep>')
 
-        @app.route(f'/{self.name}/attributes')
-        def attributes():
-            return f"Device: {self.name}, Attributes: "+", ".join(RestfulDevice.dev.public)
-
         try:
             if self.rs is not None:
                 self.rs.set(self.name, f'{self.host}:{self.port}')

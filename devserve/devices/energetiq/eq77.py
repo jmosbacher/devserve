@@ -6,7 +6,11 @@ from ..device import Device
 
 class EQ77(Device):
 
-    public = ['power', 'connected', 'port']
+    public = ['power', 'port']
+
+    def __init__(self, port='COM1'):
+        super().__init__()
+        self._port = port
 
     def query(self, q):
         if q not in ['U','D','Q']:
@@ -59,8 +63,7 @@ class EQ77(Device):
         self._port = value
         self.connect()
 
-    def __init__(self, port='COM1'):
-        self._port = port
+
         
 # device_directory['EQ77'] = EQ77
 

@@ -2,17 +2,20 @@ import random
 
 
 class Device:
-
-    public = ['connected']
+    _public = ('connected', 'attributes')
+    public = []
 
     def __init__(self, *args, **kwargs):
-        pass
+        self.public.extend(self._public)
 
     def connect(self):
         raise NotImplementedError
 
     def disconnect(self):
         raise NotImplementedError
+
+    def attributes(self):
+        return self.public
 
     def __enter__(self):
         self.connect()
@@ -21,7 +24,7 @@ class Device:
         self.disconnect()
 
 class Debugger(Device):
-    public = ['echo','random','connected']
+    public = ['echo','random']
     connected = True
     _echo = 'echo'
     

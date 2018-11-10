@@ -14,7 +14,7 @@ import io,re,sys
 import serial
 
 class FW102C(Device):
-    public = ['position','speed','sensors','port', 'connected']
+    public = ['position','speed','sensors','port']
     """
        Class to control the ThorLabs FW102C filter wheel
        
@@ -50,6 +50,7 @@ class FW102C(Device):
     devInfo  = None
 
     def __init__(self, port='COM9'):
+        super().__init__()
         self._port = port
         self._fw = None
         self.connect()
