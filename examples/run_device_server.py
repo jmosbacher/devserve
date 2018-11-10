@@ -1,5 +1,5 @@
 import argparse
-from devserve.device_server import DeviceServer
+from devserve.servers import DeviceServer
 
 from devserve.devices.device import Device
 from devserve.devices import device_directory

@@ -12,6 +12,12 @@ class DeviceClient:
         else:
             raise AttributeError('Attribute {} is not available'.format( item))
 
+    def __setattr__(self, key, value):
+        resp = requests.put('{addr}/{key}'.format(addr=self._addr, key=key).replace('//','/'), data={"value": value})
+        if resp.ok:
+            return resp.json()['value']
+        else:
+            raise AttributeError('Attribute {} is not available'.format(key))
 
 class SystemClient:
 
