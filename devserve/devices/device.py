@@ -20,6 +20,7 @@ class Device:
 
     def __enter__(self):
         self.connect()
+        return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.disconnect()
