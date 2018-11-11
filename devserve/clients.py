@@ -43,12 +43,12 @@ class SystemClient:
         self.devices = devices
 
     @classmethod
-    def from_config_file(cls, path: str):
+    def from_config_file(cls, host ,path: str):
         with open(path, "r") as f:
             cfgs = json.load(f)
         clients = {}
         for i, cfg in enumerate(cfgs):
-            addr = f'{host}:{5000+i}/{cfg["name"]}'
+            addr = f'http://{host}:{5000+i}/{cfg["name"]}'
             c = DeviceClient(addr)
             clients[cfg["name"]] = c
         return cls(clients)

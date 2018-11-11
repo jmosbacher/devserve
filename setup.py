@@ -10,12 +10,12 @@ setup(name='devserve',
       packages=['devserve'],
       install_requires=[
           'flask',
+          'flask_restful',
           'pyserial',
           'redis',
-          'flask_restful',
           'automodinit',
-          
-        #   ,
+          'visa',
+          'ThorlabPM100',
       ],
       
       

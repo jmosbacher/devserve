@@ -58,14 +58,14 @@ class DeviceServer:
                 self.rs.delete(self.name)
 
         except KeyboardInterrupt:
-            pass
+            print('User requested stop. Closing down gracefully...')
         except Exception as e:
             if debug:
                 print(e)
             else:
                 print('Exception raised. Closing down gracefully...')
         finally:
-            if RestfulDevice.dev.connected:
-                RestfulDevice.dev.disconnect()
+            if self.device.connected:
+                self.device.disconnect()
 
 

@@ -51,6 +51,8 @@ class SolisProxy(Device):
 
     @running.setter
     def running(self, running):
+        # if running not in [True, False]:
+        #     return
         if self._running and (self.conn.read(150) != b'Done\r\n'):
             return
         elif running:
