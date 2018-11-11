@@ -20,25 +20,32 @@
   {
     "name": "source",
     "device": "EQ77",
-    "com": "COM1"
+    "com": "COM8"
   },
 
   {
     "name": "lpfw",
     "device": "FW102",
-    "com": "COM1"
+    "com": "COM10"
   },
 
   {
     "name": "spfw",
     "device": "FW102",
-    "com": "COM1"
+    "com": "COM9"
   },
 
   {
     "name": "flipper",
     "device": "MFF101",
-    "com": "COM1"
+    "com": "37000021"
+  },
+
+  {
+    "name": "power_meter",
+    "device": "PM100",
+    "com": "USB0::0x1313::0x8072::P2005497::INSTR"
   }
+
 
 ]

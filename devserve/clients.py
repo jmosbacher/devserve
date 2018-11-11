@@ -1,9 +1,11 @@
 import requests
 import ast
+import json
+from typing import Dict
 
 class DeviceClient:
     _addr = ''
-    def __init__(self, addr):
+    def __init__(self, addr: str):
         self._addr = addr
 
     def __getattr__(self, item):
@@ -32,10 +34,24 @@ class DeviceClient:
             except:
                 raise AttributeError('Server unavailable.')
 
+
+ClientDict = Dict[str, DeviceClient]
+
 class SystemClient:
 
-    def __init__(self, devices):
+    def __init__(self, devices: ClientDict):
         self.devices = devices
+
+    @classmethod
+    def from_config_file(cls, host ,path: str):
+        with open(path, "r") as f:
+            cfgs = json.load(f)
+        clients = {}
+        for i, cfg in enumerate(cfgs):
+            addr = f'http://{host}:{5000+i}/{cfg["name"]}'
+            c = DeviceClient(addr)
+            clients[cfg["name"]] = c
+        return cls(clients)
 
     def __getattr__(self, item):
         try:

@@ -1,8 +1,7 @@
 import json
-import argparse
 from devserve.clients import DeviceClient, SystemClient
 
-host = 'localhost'
+host = 'http://localhost'
 cfgs = []
 import os
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -13,7 +12,7 @@ with open(cfg_path, "r") as f:
 def system_client():
     clients = {}
     for i, cfg in enumerate(cfgs):
-        addr = f'{host}:{5000+i}'
+        addr = f'{host}:{5000+i}/{cfg["name"]}'
         c = DeviceClient(addr)
         clients[cfg["name"]] = c
     return SystemClient(clients)
