@@ -14,8 +14,8 @@ setup(name='devserve',
           'pyserial',
           'redis',
           'automodinit',
-          'visa',
-          'ThorlabPM100',
+          'pyvisa',
+          'ThorlabsPM100',
       ],
       
       

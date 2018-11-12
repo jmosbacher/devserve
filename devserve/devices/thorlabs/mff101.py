@@ -19,10 +19,12 @@ class Position(Enum):
     unknown = b''
 
 class Status(Enum):
-    down = b'*\x04\x06\x00\x81P\x01\x00\x02\x00\x00\x90'
-    up = b'*\x04\x06\x00\x81P\x01\x00\x01\x00\x00\x90'
+    down = b'*\x04\x06\x00\x81P\x01\x00\x03\x00\x00\x90'
+    up = b'*\x04\x06\x00\x81P\x01\x00\x00\x00\x00\x90'
+    moving_down = b'*\x04\x06\x00\x81P\x01\x00\x10\x00\x00\x90'
+    moving_up = b'*\x04\x06\x00\x81P\x01\x00\x13\x00\x00\x90'
     query = b"\x29\x04\x00\x00\x21\x01"
-
+    
 class MFF101(Device):
     public = ['position', 'info', 'port']
     # Raw byte commands for "MGMSG_MOT_MOVE_JOG".
@@ -33,7 +35,7 @@ class MFF101(Device):
         self.motor = None
 
 
-
+    @property
     def connected(self):
         if self.motor is None:
             return False
@@ -58,7 +60,7 @@ class MFF101(Device):
     def position(self):
         if not self.connected:
             return 'unknown'
-        self.motor.write(Status.query)
+        self.motor.write(Status.query.value)
         mot_stat = self.motor.read(12)
         try:
             pos = Status(mot_stat).name
