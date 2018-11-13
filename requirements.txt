@@ -5,3 +5,4 @@ redis
 automodinit
 pyvisa
 ThorlabsPM100
+thorlabs_apt

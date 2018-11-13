@@ -53,6 +53,12 @@ class SystemClient:
             clients[cfg["name"]] = c
         return cls(clients)
 
+    def set_state(self, states: dict):
+        for name, state in states.items():
+            dev = self.devices.get(name, {})
+            for attr, val in state.items():
+                setattr(dev, attr, val)
+
     def __getattr__(self, item):
         try:
             return self.devices.get(item)

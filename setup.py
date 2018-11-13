@@ -16,6 +16,7 @@ setup(name='devserve',
           'automodinit',
           'pyvisa',
           'ThorlabsPM100',
+          'thorlabs_apt',
       ],
       
       

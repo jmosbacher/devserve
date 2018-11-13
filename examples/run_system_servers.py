@@ -6,6 +6,7 @@ import time
 from multiprocessing import Process
 cfgs = []
 import os
+
 if __name__ == '__main__':
     dir_path = os.path.dirname(os.path.realpath(__file__))
     cfg_path = os.path.join(dir_path, "device_config.json")
