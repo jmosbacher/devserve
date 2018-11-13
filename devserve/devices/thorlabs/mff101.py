@@ -29,9 +29,10 @@ class MFF101(Device):
     public = ['position', 'info', 'port']
     # Raw byte commands for "MGMSG_MOT_MOVE_JOG".
 
-    def __init__(self, port="37000021"):
-        super().__init__()
-        self._port = port.encode()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._port = kwargs.get('com', "37000000").encode()
         self.motor = None
 
 

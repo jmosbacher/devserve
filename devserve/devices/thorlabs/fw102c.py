@@ -49,9 +49,9 @@ class FW102C(Device):
     
     devInfo  = None
 
-    def __init__(self, port='COM9'):
-        super().__init__()
-        self._port = port
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._port = kwargs.get('com', "COM1")
         self._fw = None
 
     def help(self):

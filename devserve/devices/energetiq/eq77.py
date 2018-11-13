@@ -8,9 +8,9 @@ class EQ77(Device):
 
     public = ['power', 'port']
 
-    def __init__(self, port='COM1'):
-        super().__init__()
-        self._port = port
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._port = kwargs.get('com', "COM1")
 
     def query(self, q):
         if q not in ['U','D','Q']:

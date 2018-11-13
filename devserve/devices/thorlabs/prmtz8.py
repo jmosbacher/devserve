@@ -5,12 +5,12 @@ import thorlabs_apt as apt
 class PRMTZ8(Device):
     public = ['position', 'port', 'zero', 'step']
 
-    def __init__(self, port=27503140, zero=0, step=30):
-        super().__init__()
-        self._port = port
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._port = kwargs.get('com', 27503140)
         self._motor = None
-        self._zero = zero
-        self._step = step
+        self._zero = kwargs.get('zero', 0)
+        self._step = kwargs.get('step', 30)
 
     @property
     def position(self):

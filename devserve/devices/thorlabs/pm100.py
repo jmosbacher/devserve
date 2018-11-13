@@ -5,11 +5,12 @@ from ..device import Device
 
 
 class PM100(Device):
-    def __init__(self, port='USB0::0x1313::0x8072::P2005497::INSTR'):
 
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._port = kwargs.get('com', "USB0::0x1313::0x8072::P2005497::INSTR")
         self.pm = None
-        self._port = port
+       
 
     @property
     def port(self):
