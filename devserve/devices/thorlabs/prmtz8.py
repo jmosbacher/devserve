@@ -2,7 +2,7 @@ from ..device import Device
 import thorlabs_apt as apt
 
 
-class K10CR1(Device):
+class PRMTZ8(Device):
     public = ['position', 'port', 'zero', 'step']
 
     def __init__(self, port=27503140, zero=0, step=30):
