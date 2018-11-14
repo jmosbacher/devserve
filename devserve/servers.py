@@ -20,8 +20,6 @@ class DeviceServer:
         app = Flask(__name__)
         api = Api(app)
 
-
-
         class RestfulDevice(Resource):
             dev = self.device
             

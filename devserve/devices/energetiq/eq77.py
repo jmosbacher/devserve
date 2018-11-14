@@ -13,7 +13,7 @@ class EQ77(Device):
         self._port = kwargs.get('com', "COM1")
 
     def query(self, q):
-        if q not in ['U','D','Q']:
+        if q not in ['U', 'D', 'Q']:
             return ''
         self.conn.write(q.encode())
         res = self.conn.read(2048)

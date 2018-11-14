@@ -8,12 +8,16 @@ class SolisProxy(Device):
     Connects to a proxy script running in
     Andor solis, written with andor basic.
     """
-    public = ['save', 'running', 'save_path', 'saved', 'port']
+    public = ['save', 'running', 'save_path', 'grating', 'area', 'area_start', 'area_end',
+              'wavelength', 'exposure', 'slit_width', 'saved', 'port']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._port = kwargs.get('com', "COM1")
-        self._path = 'not_saved'
+        self._path = kwargs.get('save_path', f"andor_file_{time.now()}")
+        self._as = 400
+        self._ae = 700
+
         self._saved = False
         self._running = False
         self.conn = None
@@ -32,14 +36,27 @@ class SolisProxy(Device):
         except:
             pass
 
+    def query(self, q):
+        self.conn.write(f'{q}\r'.encode())
+        resp = self.conn.read(150)
+        return resp.strip().decode()
+
+    def command(self,cmd, *args):
+        self.conn.write(f'{cmd}\r'.encode())
+        self.conn.read(150)
+        for arg in args:
+            self.conn.write(f'{arg}\r'.encode())
+            self.conn.read(150)
+
     @property
     def save_path(self):
         return self._path
 
     @save_path.setter
-    def save_path(self, path):
-        self._path = path
-        self._saved = False
+    def save_path(self, value):
+        if isinstance(value, str):
+            self._path = value
+            self._saved = False
 
     @property
     def saved(self):
@@ -48,15 +65,12 @@ class SolisProxy(Device):
     @saved.setter
     def saved(self, value):
         if value in [1, True, 'True']:
-            self.conn.write(b'Save\r')
-            self.conn.read(150)
-            self.conn.write(self._path.encode()+b'\r')
-            self.conn.read(150)
+            self.command("Save", self._path)
             self._saved = True
 
     @property
     def running(self):
-        if self._running and (self.conn.read(150) == b'Done\r\n'):
+        if self._running and (self.conn.read(150, timeout=0.1) == b'Done\r\n'):
             self._running = False
         return self._running
 
@@ -64,12 +78,44 @@ class SolisProxy(Device):
     def running(self, running):
         # if running not in [True, False]:
         #     return
-        if self._running and (self.conn.read(150) != b'Done\r\n'):
+        if self._running and (self.conn.read(150, timeout=0.1) != b'Done\r\n'):
             return
         elif running in [1, True, 'True']:
-            self.conn.write(b'Run\r')
+            self.command('Run')
             self._running = True
 
+    @property
+    def grating(self):
+        return self.query("GetGrating")
+
+    @grating.getter
+    def grating(self, value):
+        if value in [1, 2]:
+            self.command("SetGrating", value)
+
+    @property
+    def wavelength(self):
+        pass
+
+    @wavelength.setter
+    def wavelength(self, value):
+        self.command("SetWavelength", value)
+
+    @property
+    def exposure(self):
+        pass
+
+    @exposure.setter
+    def exposure(self, value):
+        self.command("SetExposureTime", value)
+
+    @property
+    def slit_width(self):
+        pass
+
+    @slit_width.setter
+    def slit_width(self):
+        pass
 
     def connect(self):
         try:
