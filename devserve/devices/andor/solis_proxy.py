@@ -41,7 +41,7 @@ class SolisProxy(Device):
         resp = self.conn.read(150)
         return resp.strip().decode()
 
-    def command(self,cmd, *args):
+    def command(self, cmd, *args):
         self.conn.write(f'{cmd}\r'.encode())
         self.conn.read(150)
         for arg in args:
@@ -111,11 +111,11 @@ class SolisProxy(Device):
 
     @property
     def slit_width(self):
-        pass
+        return self.query("GetSlitWidth")
 
     @slit_width.setter
-    def slit_width(self):
-        pass
+    def slit_width(self, value):
+        self.command("SetSlitWidth", value)
 
     def connect(self):
         try:
