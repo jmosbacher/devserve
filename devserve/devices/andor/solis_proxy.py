@@ -78,7 +78,7 @@ class SolisProxy(Device):
     def running(self, running):
         # if running not in [True, False]:
         #     return
-        if self._running and (self.conn.read(150, timeout=0.1) != b'Done\r\n'):
+        if self._running:
             return
         elif running in [1, True, 'True']:
             self.command('Run')
