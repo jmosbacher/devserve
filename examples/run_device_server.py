@@ -43,6 +43,6 @@ if __name__ == '__main__':
     else:
         rs = None
 
-    device = device_directory[a.device](f'{a.com}')
+    device = device_directory[a.device](**vars(a))
     server = DeviceServer(a.name, a.host, a.port, device, rs)
     server.run(debug=a.debug)
