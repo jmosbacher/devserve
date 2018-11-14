@@ -42,6 +42,12 @@
   },
 
   {
+    "name": "crystal_wheel",
+    "device": "PRMTZ8",
+    "com": 27503140
+  },
+
+  {
     "name": "power_meter",
     "device": "PM100",
     "com": "USB0::0x1313::0x8072::P2005497::INSTR"

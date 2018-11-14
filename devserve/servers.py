@@ -22,16 +22,16 @@ class DeviceServer:
 
         class RestfulDevice(Resource):
             dev = self.device
-            
+            attrs = dev.public + dev._common
             def get(self, ep):
-                if ep in self.dev.public:
+                if ep in self.attrs:
                     val = getattr(self.dev, ep)
                     return {"name":ep, "value" : val}
                 else:
                     abort(f'No attribute named {ep}')
                 
             def put(self, ep):
-                if ep in self.dev.public:
+                if ep in self.attrs:
                     args = rparser.parse_args()
                     try:
                         val = ast.literal_eval(args['value'])
