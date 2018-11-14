@@ -10,7 +10,6 @@ class EQ77(Device):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.public.extend(self._common)
         self._port = kwargs.get('com', "COM1")
         self.conn = None
 

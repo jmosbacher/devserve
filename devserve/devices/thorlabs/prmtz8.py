@@ -13,13 +13,17 @@ class PRMTZ8(Device):
 
     @property
     def position(self):
+        if self._motor is None:
+            return
         deg = self._motor.position
         pos = (deg-self._zero)/self._step
         return int(pos)
 
     @position.setter
     def position(self, pos):
-        deg = self._zero + pos/self._step
+        if self._motor is None:
+            return
+        deg = self._zero + pos*self._step
         self._motor.move_to(deg, True)
 
     @property
@@ -52,18 +56,18 @@ class PRMTZ8(Device):
             return
         try:
             import thorlabs_apt as apt
-            apt.core._cleanup()
-            self.motor = apt.Motor(self._port)
+            self._motor = apt.Motor(self._port)
         except:
             pass
 
     def disconnect(self):
         try:
             import thorlabs_apt as apt
-            self.motor = None
+            self._motor = None
             apt.core._cleanup()
         except:
             pass
+            
     @property
     def connected(self):
         if self._motor is None:
