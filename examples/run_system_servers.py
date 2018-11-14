@@ -19,7 +19,7 @@ if __name__ == '__main__':
     for i, cfg in enumerate(cfgs):
         port = 5000+i
         try:
-            device = device_directory[cfg["device"]](f'{cfg["com"]}')
+            device = device_directory[cfg["device"]](**cfg)
             server = DeviceServer(cfg["name"], host, port, device)
             p = Process(target=server.run)
             print(f"starting device server for {cfg['name']}...")

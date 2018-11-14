@@ -11,6 +11,7 @@ class EQ77(Device):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._port = kwargs.get('com', "COM1")
+        self.conn = None
 
     def query(self, q):
         if q not in ['U', 'D', 'Q']:
@@ -46,7 +47,7 @@ class EQ77(Device):
 
     @property
     def connected(self):
-        if self.conn:
+        if self.conn is not None:
             return self.conn.is_open
         return False
 

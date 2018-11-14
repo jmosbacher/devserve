@@ -25,13 +25,13 @@
 
   {
     "name": "lpfw",
-    "device": "FW102",
+    "device": "FW102C",
     "com": "COM10"
   },
 
   {
     "name": "spfw",
-    "device": "FW102",
+    "device": "FW102C",
     "com": "COM9"
   },
 
@@ -39,6 +39,12 @@
     "name": "flipper",
     "device": "MFF101",
     "com": "37000021"
+  },
+
+  {
+    "name": "crystal_wheel",
+    "device": "PRMTZ8",
+    "com": 27503140
   },
 
   {

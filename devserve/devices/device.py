@@ -2,11 +2,11 @@ import random
 
 
 class Device:
-    _public = ('connected', 'attributes')
+    _common = ['connected', 'attributes']
     public = []
 
     def __init__(self, *args, **kwargs):
-        self.public.extend(self._public)
+        pass
 
     def connect(self):
         raise NotImplementedError
@@ -29,7 +29,10 @@ class Debugger(Device):
     public = ['echo','random']
     connected = True
     _echo = 'echo'
-    
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     @property
     def echo(self):
         return self._echo

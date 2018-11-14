@@ -14,7 +14,7 @@ class SolisProxy(Device):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._port = kwargs.get('com', "COM1")
-        self._path = kwargs.get('save_path', f"andor_file_{time.now()}")
+        self._path = kwargs.get('save_path', f"andor_file_{time.time()}")
         self._as = 400
         self._ae = 700
 
@@ -88,7 +88,7 @@ class SolisProxy(Device):
     def grating(self):
         return self.query("GetGrating")
 
-    @grating.getter
+    @grating.setter
     def grating(self, value):
         if value in [1, 2]:
             self.command("SetGrating", value)
