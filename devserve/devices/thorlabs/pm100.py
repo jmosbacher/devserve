@@ -5,12 +5,12 @@ from ..device import Device
 
 
 class PM100(Device):
+    public = ['power', 'count']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._port = kwargs.get('com', "USB0::0x1313::0x8072::P2005497::INSTR")
         self.pm = None
-       
 
     @property
     def port(self):
@@ -25,6 +25,25 @@ class PM100(Device):
             self.connect()
         except:
             pass
+
+    @property
+    def power(self):
+        if self.pm is None:
+            return
+        return self.pm.sense.read
+
+    @property
+    def count(self):
+        if self.pm is None:
+            return
+        return self.pm.sense.average.count
+
+    @count.setter
+    def count(self, value):
+        value = int(value)
+        if self.pm is None:
+            return
+        self.pm.sense.average.count = value
 
     def connect(self):
         try:
