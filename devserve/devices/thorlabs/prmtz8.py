@@ -1,5 +1,4 @@
 from ..device import Device
-import thorlabs_apt as apt
 
 
 class PRMTZ8(Device):
@@ -52,13 +51,18 @@ class PRMTZ8(Device):
         if self.connected:
             return
         try:
+            import thorlabs_apt as apt
             self.motor = apt.Motor(self._port)
         except:
             pass
 
     def disconnect(self):
         self.motor = None
-        self.apt._cleanup()
+        try:
+            import thorlabs_apt as apt
+            apt.core._cleanup()
+        except:
+            pass
 
     @property
     def connected(self):
