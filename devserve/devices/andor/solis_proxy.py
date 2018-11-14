@@ -95,7 +95,7 @@ class SolisProxy(Device):
 
     @property
     def wavelength(self):
-        pass
+        return self.query("GetWavelength")
 
     @wavelength.setter
     def wavelength(self, value):
@@ -103,7 +103,7 @@ class SolisProxy(Device):
 
     @property
     def exposure(self):
-        pass
+        return self.query("GetExposureTime")
 
     @exposure.setter
     def exposure(self, value):
@@ -132,3 +132,4 @@ class SolisProxy(Device):
     def disconnect(self):
         if self.connected:
             self.conn.close()
+            
