@@ -5,7 +5,7 @@ from ..device import Device
 
 
 class PM100(Device):
-    public = ['power', 'count']
+    public = ['power', 'count', 'port']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -30,7 +30,7 @@ class PM100(Device):
     def power(self):
         if self.pm is None:
             return
-        return self.pm.sense.read
+        return self.pm.read
 
     @property
     def count(self):
@@ -50,7 +50,7 @@ class PM100(Device):
             import visa
             from ThorlabsPM100 import ThorlabsPM100
             rm = visa.ResourceManager()
-            inst = rm.open_resource(self._port, term_chars='\n', timeout=1)
+            inst = rm.open_resource(self._port, timeout=1)
             self.pm = ThorlabsPM100(inst=inst)
         except:
             pass
