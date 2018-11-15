@@ -13,7 +13,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Start an device webserver.')
     parser.add_argument('-DEVICE', '--DEVICE', dest='device', default='Debugger',
                 choices=device_names, help=f'Device to control. Default is: Debugger.')
-    parser.add_argument('-NAME', '--NAME', dest='name', default='dev',
+    parser.add_argument('-NAME', '--NAME', dest='name', default='debug',
                 help='Device name, must be unique.')
     parser.add_argument('-COM', '--COM', dest='com', default='COM1',
                 help='Serial port.')

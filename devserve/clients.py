@@ -11,11 +11,16 @@ class DeviceClient:
     def __getattr__(self, item):
         try:
             resp = requests.get('{addr}/{item}'.format(addr=self._addr, item=item))
-            if resp.ok:
+            if resp.status_code is 200:
+                val = None
+                try:
+                    val = resp.json().get('value', None)
+                except:
+                    pass
                 try:
                     val = ast.literal_eval(resp.json().get('value', None))
                 except:
-                    val = resp.json().get('value', None)
+                    pass
                 return val
         except:
             raise AttributeError('Device address unavailable.')
@@ -27,8 +32,17 @@ class DeviceClient:
         else:
             try:
                 resp = requests.put('{addr}/{key}'.format(addr=self._addr, key=key), data={"value": value})
-                if resp.ok:
-                    return
+                if resp.status_code is 201:
+                    val = None
+                    try:
+                        val = resp.json().get('value', None)
+                    except:
+                        pass
+                    try:
+                        val = ast.literal_eval(resp.json().get('value', None))
+                    except:
+                        pass
+                    return val
                 else:
                     raise 'Bad response from server code: {}'.format(resp.status_code)
             except:

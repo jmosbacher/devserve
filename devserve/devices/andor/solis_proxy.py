@@ -8,16 +8,13 @@ class SolisProxy(Device):
     Connects to a proxy script running in
     Andor solis, written with andor basic.
     """
-    public = ['save', 'running', 'save_path', 'grating', 'area', 'area_start', 'area_end',
+    public = ['save', 'running', 'save_path', 'grating',
               'wavelength', 'exposure', 'slit_width', 'saved', 'port']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._port = kwargs.get('com', "COM1")
         self._path = kwargs.get('save_path', f"andor_file_{time.time()}")
-        self._as = 400
-        self._ae = 700
-
         self._saved = False
         self._running = False
         self.conn = None
