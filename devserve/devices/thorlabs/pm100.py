@@ -30,6 +30,7 @@ class PM100(Device):
     def power(self):
         if self.pm is None:
             return
+        # return self.pm.sense.average
         return self.pm.read
 
     @property
@@ -44,6 +45,18 @@ class PM100(Device):
         if self.pm is None:
             return
         self.pm.sense.average.count = value
+
+    @property
+    def wavelength(self):
+        return self.pm.sense.correction.wavelength
+
+    @wavelength.setter
+    def wavelength(self, value):
+        self.pm.sense.correction.wavelength = value
+
+    @property
+    def configuration(self):
+        return self.pm.getconfigure
 
     def connect(self):
         try:

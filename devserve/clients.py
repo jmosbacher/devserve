@@ -13,9 +13,9 @@ class DeviceClient:
             resp = requests.get('{addr}/{item}'.format(addr=self._addr, item=item))
             if resp.ok:
                 try:
-                    val = ast.literal_eval(resp.json()['value'])
+                    val = ast.literal_eval(resp.json().get('value', None))
                 except:
-                    val = resp.json()['value']
+                    val = resp.json().get('value', None)
                 return val
         except:
             raise AttributeError('Device address unavailable.')

@@ -69,8 +69,6 @@ class EQ77(Device):
         except:
             pass
 
-        
-# device_directory['EQ77'] = EQ77
 
 if __name__ == '__main__':
     with EQ77('COM8') as en:
