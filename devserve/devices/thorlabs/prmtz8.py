@@ -2,33 +2,32 @@ from ..device import Device
 
 
 class PRMTZ8(Device):
-    public = ['position', 'port', 'zero', 'step', 'direction']
+    public = ['position', 'port', 'zero', 'step', 'reverse']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._port = kwargs.get('com', 27503140)
         self._motor = None
         self._zero = kwargs.get('zero', None)
-        self._direction = -1
-        self._step = kwargs.get('step', -30)
-        self._pos_mapper = {}
-        self._make_mapper()
-
-    def _make_mapper(self):
-        base = self._step*self._direction
-        self._pos_mapper = {x: (self._zero + base * x if x < 7 else
-                                self._zero - base * (12 - x))
-                            for x in range(12)}
+        self._reverse = kwargs.get('reverse', True)
+        self._step = kwargs.get('step', 30)
+        self._make_pos_mapper()
+        
+    
+    def _make_pos_mapper(self):
+        self._pos_mapper = {x:(-y if self._reverse else y) for x,y in zip(list(range(7,12))+list(range(7)), range(-5,7))}
 
     @property
-    def direction(self):
-        return self._direction
+    def reverse(self):
+        return self._reverse
 
-    @direction.setter
-    def direction(self, value):
-        self._direction = value
-        self._make_mapper()
-
+    @reverse.setter
+    def reverse(self, value):
+        if value in [True, False]:
+            self._reverse = value
+        self._make_pos_mapper()
+        
+        
     @property
     def step(self):
         return self._step
@@ -36,8 +35,7 @@ class PRMTZ8(Device):
     @step.setter
     def step(self, value):
         self._step = value
-        self._make_mapper()
-
+    
     @property
     def zero(self):
         return self._zero
@@ -45,7 +43,6 @@ class PRMTZ8(Device):
     @zero.setter
     def zero(self, value):
         self._zero = value
-        self._make_mapper()
 
     @property
     def position(self):
@@ -53,14 +50,25 @@ class PRMTZ8(Device):
             return
         deg = self._motor.position
         pos = (deg-self._zero)/self._step
-        return int(pos)
+        if self._reverse:
+            pos = -pos
+        # print(f'At abs pos: {deg} degrees')
+        pos = int(round(pos))
+        if pos>=0:
+            return pos
+        else:
+            return pos+12
 
     @position.setter
     def position(self, pos):
-        if self._motor is None or pos not in self._pos_mapper:
+        if self._motor is None or pos not in range(12):
             return
-        deg = self._pos_mapper[pos]
-        self._motor.move_to(deg, blocking=True)
+        pos = self._pos_mapper[pos]
+        now = self._pos_mapper[self.position]
+        # print(f'now at {now} moving to {pos}')
+        deg = (pos-now)*self._step
+        # print(f'moving {deg} degrees')
+        self._motor.move_by(deg, blocking=True)
 
 
     @property
@@ -80,6 +88,7 @@ class PRMTZ8(Device):
             self._motor = apt.Motor(self._port)
             if self._zero is None:
                 self._zero = self._motor.position
+         
         except:
             pass
 

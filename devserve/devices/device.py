@@ -18,6 +18,17 @@ class Device:
     def attributes(self):
         return self.public
 
+    @property
+    def connected(self):
+        return False
+
+    @connected.setter
+    def connected(self, value):
+        if value is True:
+            self.connect()
+        else:
+            self.disconnect()
+
     def __enter__(self):
         self.connect()
         return self
