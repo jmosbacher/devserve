@@ -57,6 +57,7 @@ class DeviceServer:
 
         except KeyboardInterrupt:
             print('User requested stop. Closing down gracefully...')
+            
         except Exception as e:
             if debug:
                 print(e)

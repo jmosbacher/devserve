@@ -5,7 +5,7 @@ from ..device import Device
 
 
 class PM100(Device):
-    public = ['power', 'count', 'port']
+    public = ['power', 'count', 'port', 'wavelength', 'mode', 'autorange']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -30,7 +30,6 @@ class PM100(Device):
     def power(self):
         if self.pm is None:
             return
-        # return self.pm.sense.average
         return self.pm.read
 
     @property
@@ -44,7 +43,11 @@ class PM100(Device):
         value = int(value)
         if self.pm is None:
             return
-        self.pm.sense.average.count = value
+        if value >700:
+            self.pm.sense.average.count = 700
+            return
+        elif value>0:
+            self.pm.sense.average.count = value
 
     @property
     def wavelength(self):
@@ -55,8 +58,19 @@ class PM100(Device):
         self.pm.sense.correction.wavelength = value
 
     @property
-    def configuration(self):
+    def mode(self):
         return self.pm.getconfigure
+
+    @property
+    def autorange(self):
+        return self.pm.sense.power.dc.range.auto is 1
+
+    @autorange.setter
+    def autorange(self, value):
+        if value in [0, False, 'False', 'false', 'off']:
+            self.pm.sense.power.dc.range.auto = 0
+        elif value in [1, True, 'True', 'true','on']:
+            self.pm.sense.power.dc.range.auto = 1
 
     def connect(self):
         try:
