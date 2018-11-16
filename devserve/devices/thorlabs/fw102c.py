@@ -16,7 +16,7 @@ import serial
 
 
 class FW102C(Device):
-    public = ['position','speed','sensors','port']
+    public = ['position', 'speed', 'sensors', 'port', 'cached_status']
     regerr = re.compile("Command error.*")
     """
        Class to control the ThorLabs FW102C filter wheel
@@ -56,6 +56,7 @@ class FW102C(Device):
         super().__init__(*args, **kwargs)
         self._port = kwargs.get('com', "COM1")
         self._fw = None
+        self._status = {}
 
     def help(self):
         print( self.__doc__)
@@ -90,13 +91,23 @@ class FW102C(Device):
             self._sio.write(u'*idn?\r')
             self.devInfo = self._sio.readlines(2048)[1][:-1]
 
+            for attr in self.public:
+                if attr == 'cached_status':
+                    continue
+                self._status[attr] = getattr(self, attr)
+
         except  serial.SerialException as ex:
             print( 'Port {0} is unavailable: {1}'.format(self.port, ex))
             return
+
         except  OSError as ex:
             print( 'Port {0} is unavailable: {1}'.format(self.port, ex))
             return
-
+    
+    @property
+    def cached_status(self):
+        return self._status
+    
     def disconnect(self):
         if not self.connected:
             print( "Disconnect error: Device not open")
@@ -166,6 +177,7 @@ class FW102C(Device):
     @position.setter
     def position(self, value):
         self.command(f'pos={value}')
+        self._status['position'] = value
         return self.position
 
     @property
@@ -176,7 +188,8 @@ class FW102C(Device):
     def sensors(self, value):
         if value in [0,1]:
             self.command(f'sensors={value}')
-        return self.position
+            self._status['sensors'] = value
+        
 
     @property
     def speed(self):
@@ -186,7 +199,8 @@ class FW102C(Device):
     def speed(self, value):
         if value in [0,1]:
             self.command(f'speed={value}')
-        return self.speed
+            self._status['speed'] = value
+       
     
 
 # Class test, when called directly

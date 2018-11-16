@@ -67,6 +67,15 @@ class SystemClient:
             clients[cfg["name"]] = c
         return cls(clients)
 
+    @classmethod
+    def from_dict(cls, cfgs: str, host='localhost'):
+        clients = {}
+        for i, cfg in enumerate(cfgs):
+            addr = f'http://{host}:{5000+i}/{cfg["name"]}'
+            c = DeviceClient(addr)
+            clients[cfg["name"]] = c
+        return cls(clients)
+
     def set_state(self, states: dict):
         for name, state in states.items():
             dev = self.devices.get(name, {})
