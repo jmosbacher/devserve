@@ -11,10 +11,13 @@
 from ..device import Device
 # from .. import device_directory
 import io,re,sys
+
 import serial
+
 
 class FW102C(Device):
     public = ['position','speed','sensors','port']
+    regerr = re.compile("Command error.*")
     """
        Class to control the ThorLabs FW102C filter wheel
        
@@ -137,8 +140,8 @@ class FW102C(Device):
         cmd = cmdstr.split('=')[0]
         res = self._sio.write(cmdstr+u'\r')
         ans = self._sio.readlines(2048)
-        regerr = re.compile("Command error.*")
-        errors = [m.group(0) for l in ans for m in [regerr.search(l)] if m]
+
+        errors = [m.group(0) for l in ans for m in [self.regerr.search(l)] if m]
         #print 'res=',repr(res),'ans=',repr(ans),cmd
         if len(errors) > 0:
             return errors[0]

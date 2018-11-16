@@ -8,8 +8,8 @@ class SolisProxy(Device):
     Connects to a proxy script running in
     Andor solis, written with andor basic.
     """
-    public = ['save', 'running', 'save_path', 'grating',
-              'wavelength', 'exposure', 'slit_width', 'saved', 'port']
+    public = ['saved', 'running', 'save_path', 'grating',
+              'wavelength', 'exposure', 'slit_width', 'port']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -61,13 +61,15 @@ class SolisProxy(Device):
 
     @saved.setter
     def saved(self, value):
-        if value in [1, True, 'True']:
+        if value in [1, True, 'True', 'true']:
             self.command("Save", self._path)
             self._saved = True
+        elif value in [0, False, 'False', 'false']:
+            self._saved = False
 
     @property
     def running(self):
-        if self._running and (self.conn.read(150, timeout=0.1) == b'Done\r\n'):
+        if self._running and (self.conn.read(150, timeout=0.2) == b'Done\r\n'):
             self._running = False
         return self._running
 
@@ -80,6 +82,7 @@ class SolisProxy(Device):
         elif running in [1, True, 'True']:
             self.command('Run')
             self._running = True
+            self._saved = False
 
     @property
     def grating(self):
