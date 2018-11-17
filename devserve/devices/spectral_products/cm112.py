@@ -33,7 +33,7 @@ class CM112(Device):
 
     @property
     def wavelength(self):
-        h, l, *_ = self.query(56,0)
+        h, l, *_ = self.query(56, 0)
         return (h*256+l)/10
 
     @wavelength.setter 

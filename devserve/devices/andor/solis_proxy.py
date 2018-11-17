@@ -43,7 +43,7 @@ class SolisProxy(Device):
         self.conn.read(150)
         for arg in args:
             self.conn.write(f'{arg}\r'.encode())
-            self.conn.read(150)
+        self.conn.read(150)
 
     @property
     def save_path(self):

@@ -1,12 +1,12 @@
 from ..device import Device
-
+import ast
 
 class PRMTZ8(Device):
     public = ['position', 'port', 'zero', 'step', 'reverse']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._port = kwargs.get('com', 27503140)
+        self._port = ast.literal_eval(kwargs.get('com', 27503140))
         self._motor = None
         self._zero = kwargs.get('zero', None)
         self._reverse = kwargs.get('reverse', True)

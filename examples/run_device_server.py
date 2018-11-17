@@ -11,19 +11,19 @@ if __name__ == '__main__':
     device_names = list(device_directory.keys())
     device_names_str = ",".join(device_names)
     parser = argparse.ArgumentParser(description='Start an device webserver.')
-    parser.add_argument('-DEVICE', '--DEVICE', dest='device', default='Debugger',
+    parser.add_argument('-device', '--device', dest='device', default='Debugger',
                 choices=device_names, help=f'Device to control. Default is: Debugger.')
-    parser.add_argument('-NAME', '--NAME', dest='name', default='debug',
+    parser.add_argument('-name', '--name', dest='name', default='debug',
                 help='Device name, must be unique.')
-    parser.add_argument('-COM', '--COM', dest='com', default='COM1',
-                help='Serial port.')
-    parser.add_argument('-HOST', '--HOST',dest='host',default='localhost',
+    # parser.add_argument('-COM', '--COM', dest='com', default='COM1',
+    #             help='Serial port.')
+    parser.add_argument('-host', '--host',dest='host',default='localhost',
                 help='IP to serve on.')
-    parser.add_argument('-PORT', '--PORT',dest='port', type=int, default=5000,
+    parser.add_argument('-port', '--port',dest='port', type=int, default=5000,
             help='Port to open.')
-    parser.add_argument('-DEBUG', '--DEBUG', action='store_const', dest='debug',
+    parser.add_argument('-debug', '--debug', action='store_const', dest='debug',
                 const=True, default=False, help='Run server in debug mode.')
-    parser.add_argument('-REDIS', '--REDIS', action='store_const', dest='set_redis',
+    parser.add_argument('-redis', '--redis', action='store_const', dest='set_redis',
                         const=True, default=False, help='Set address in redis.')
     parsed, unknown = parser.parse_known_args()  # this is an 'internal' method
     # which returns 'parsed', the same as what parse_args() would return
@@ -33,7 +33,7 @@ if __name__ == '__main__':
     for arg in unknown:
         if arg.startswith(("-", "--")):
             # you can pass any arguments to add_argument
-            parser.add_argument(arg,)
+            parser.add_argument(arg)
 
     a = parser.parse_args()
 
