@@ -8,7 +8,7 @@ class SolisProxy(Device):
     Connects to a proxy script running in
     Andor solis, written with andor basic.
     """
-    public = ['saved', 'running', 'save_path', 'grating',
+    public = ['saved', 'running', 'save_path', 'grating', shutter,
               'wavelength', 'exposure', 'slit_width', 'port']
 
     def __init__(self, *args, **kwargs):
@@ -66,6 +66,18 @@ class SolisProxy(Device):
             self._saved = True
         elif value in [0, False, 'False', 'false']:
             self._saved = False
+
+
+    @property
+    def shutter(self):
+        return self.query("GetShutter")
+
+    @shutter.setter
+    def shutter(self, value):
+        if value in [1, True, 'Open', 'open']:
+            self.command("SetShutter", 1)
+        elif value in [0, False, 'Closed', 'closed']:
+            self.command("SetShutter", 0)
 
     @property
     def running(self):
