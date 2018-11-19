@@ -111,7 +111,8 @@ class SolisProxy(Device):
 
     @wavelength.setter
     def wavelength(self, value):
-        self.command("SetWavelength", value)
+        if (2000 >= value >= 200):
+            self.command("SetWavelength", value)
 
     @property
     def exposure(self):
@@ -123,11 +124,12 @@ class SolisProxy(Device):
 
     @property
     def slit_width(self):
-        return self.query("GetSlitWidth")
+        return self.query("GetSlit")
 
     @slit_width.setter
     def slit_width(self, value):
-        self.command("SetSlitWidth", value)
+        if (2500 >= value >=10):
+            self.command("SetSlit", value)
 
     def connect(self):
         try:

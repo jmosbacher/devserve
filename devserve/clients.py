@@ -116,10 +116,17 @@ class DeviceClient:
 
 ClientDict = Dict[str, DeviceClient]
 
+
+class GlobalStorage:
+    pass
+
+
 class SystemClient:
 
     def __init__(self, devices: ClientDict):
         self.devices = devices
+        if "global" not in self.devices:
+            self.devices['global'] = GlobalStorage()
 
     @classmethod
     def from_json_file(cls, host ,path: str):

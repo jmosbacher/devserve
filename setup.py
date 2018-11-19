@@ -3,7 +3,7 @@ from setuptools import setup
 setup(name='devserve',
       version='0.11',
       description='Web based control software for our custom built spectrofluoremeter ',
-      url='http://github.com/jmosbacher/straxrpc',
+      url='http://github.com/jmosbacher/devserve',
       author='Yossi Mosbacher',
       author_email='joe.mosbacher@gmail.com',
       license='MIT',
