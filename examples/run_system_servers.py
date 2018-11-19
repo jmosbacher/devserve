@@ -1,7 +1,7 @@
 import argparse
 import configparser
 import time
-from subprocess import PIPE, Popen
+from subprocess import PIPE, Popen, signal
 import os
 import datetime
 import socket
@@ -119,7 +119,10 @@ if __name__ == '__main__':
         print("Trying to shut down gracefully...")
         for p in ps.values():
             if p.poll() is None:
-                p.send_signal(2)
+                try:
+                    p.send_signal(signal.SIGINT)
+                except:
+                    p.terminate()
         print(f"Waiting {CLOSE_TIME} seconds for all processes to close...")
         for i in range(CLOSE_TIME):
             print(CLOSE_TIME-i)
@@ -127,7 +130,10 @@ if __name__ == '__main__':
 
     finally:
         for name, p in ps.items():
-            p.send_signal(2)
+            try:
+                p.send_signal(2)
+            except:
+                pass
             if p.poll() is None:
                 print(f'{name} not responding. Killing process.')
                 p.kill()
