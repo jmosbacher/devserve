@@ -131,7 +131,7 @@ class SolisProxy(Device):
 
     def connect(self):
         try:
-            self.conn = serial.Serial(self._port, baudrate=9600, timeout=1)
+            self.conn = serial.Serial(self._port, baudrate=38400, timeout=1)
         except:
             pass
 
