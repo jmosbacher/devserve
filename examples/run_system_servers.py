@@ -5,6 +5,7 @@ from subprocess import PIPE, Popen
 import os
 import datetime
 import socket
+import sys
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.connect(("8.8.8.8", 80))
@@ -16,8 +17,9 @@ def run(name, idx, cfg, debug=False):
     tags = cfg.pop('tags', '').split(' ')
     for k, v in cfg.items():
         cfg[k] = v.format(idx=idx, myip=myip)
+    args = [sys.executable]
+    args.append(cfg.pop('script', 'run_device_server.py'))
 
-    args = cfg.pop('command', 'python run_device_server.py').split(' ')
     args.extend(['--name', name])
     for k, v in cfg.items():
         args.extend([f'--{k}', f'{v}'])
@@ -97,16 +99,16 @@ if __name__ == '__main__':
                     restart.append((idx, name))
                     print(f"Looks like {name} has shutdown. Will try to restart.")
 
-            for idx, name in restart:
-                print(f"Trying to restart {name}.")
-                try:
-                    p = ps[name]
-                    p.kill()
-                    cfg = dict(config[name])
-                    p = run(name, idx, cfg)
-                    ps[name] = p
-                except:
-                    pass
+            # for idx, name in restart:
+            #     print(f"Trying to restart {name}.")
+            #     try:
+            #         p = ps[name]
+            #         p.kill()
+            #         cfg = dict(config[name])
+            #         p = run(name, idx, cfg)
+            #         ps[name] = p
+            #     except:
+            #         pass
 
             time.sleep(10)
             restart = []
@@ -130,5 +132,5 @@ if __name__ == '__main__':
                 print(f'{name} not responding. Killing process.')
                 p.kill()
             if debug:
-                print('sdtout for {name}: \n', p.stdout.read().decode())
+                print(f'sdtout for {name}: \n', p.stdout.read().decode())
         time.sleep(0.5)
