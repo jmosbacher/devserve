@@ -99,16 +99,16 @@ if __name__ == '__main__':
                     restart.append((idx, name))
                     print(f"Looks like {name} has shutdown. Will try to restart.")
 
-            # for idx, name in restart:
-            #     print(f"Trying to restart {name}.")
-            #     try:
-            #         p = ps[name]
-            #         p.kill()
-            #         cfg = dict(config[name])
-            #         p = run(name, idx, cfg)
-            #         ps[name] = p
-            #     except:
-            #         pass
+            for idx, name in restart:
+                print(f"Trying to restart {name}.")
+                try:
+                    p = ps[name]
+                    p.kill()
+                    cfg = dict(config[name])
+                    p = run(name, idx, cfg)
+                    ps[name] = p
+                except:
+                    pass
 
             time.sleep(10)
             restart = []

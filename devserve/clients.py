@@ -4,7 +4,12 @@ import json
 from typing import Dict
 import threading
 import time
+import socket
 
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.connect(("8.8.8.8", 80))
+myip = s.getsockname()[0]
+s.close()
 
 class DeviceClient:
 
@@ -136,10 +141,10 @@ class SystemClient:
         for idx, name in enumerate(config.sections()):
             cfg = dict(config[name])
             for k,v in cfg.items():
-                cfg[k] = v.format(idx=idx)
+                cfg[k] = v.format(idx=idx, myip=myip)
             addr = f'http://{cfg["host"]}:{cfg["port"]}/{name}'
             c = DeviceClient(name, addr)
-            clients[cfg["name"]] = c
+            clients[name] = c
         return cls(clients)
 
     @classmethod
