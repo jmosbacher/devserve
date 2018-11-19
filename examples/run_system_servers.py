@@ -130,7 +130,10 @@ if __name__ == '__main__':
 
     finally:
         for name, p in ps.items():
-            p.send_signal(2)
+            try:
+                p.send_signal(2)
+            except:
+                pass
             if p.poll() is None:
                 print(f'{name} not responding. Killing process.')
                 p.kill()
