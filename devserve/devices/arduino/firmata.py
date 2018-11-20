@@ -78,7 +78,7 @@ class FirmataDigitalPin(Device):
     @board.setter
     def board(self, value):
         if value in ["Arduino", "ArduinoDue", "ArduinoMega"]:
-            self._board  = value
+            self._board_type = value
             self.connect()
 
     @property
