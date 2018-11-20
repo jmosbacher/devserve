@@ -2,7 +2,7 @@ import serial
 import struct
 import time
 from ..device import Device
-
+import ast
 class SolisProxy(Device):
     """
     Connects to a proxy script running in
@@ -48,14 +48,15 @@ class SolisProxy(Device):
     def query(self, q):
         self.conn.write(f'{q}\r'.encode())
         resp = self.conn.read(150)
-        return resp.strip().decode()
+        resp = resp.strip().decode()
+        return resp
 
     def command(self, cmd, *args):
         self.conn.write(f'{cmd}\r'.encode())
         self.conn.read(150)
         for arg in args:
             self.conn.write(f'{arg}\r'.encode())
-        self.conn.read(150)
+            self.conn.read(150)
 
     @property
     def save_path(self):
@@ -99,6 +100,8 @@ class SolisProxy(Device):
             self.command("SetShutter", "open")
         elif value in [0, False, 'Closed', 'closed']:
             self.command("SetShutter", 'close')
+        else:
+            self.command("SetShutter", 'auto')
 
     @property
     def running(self):
@@ -125,6 +128,11 @@ class SolisProxy(Device):
     def grating(self, value):
         if value in [1, 2]:
             self.command("SetGrating", value)
+        while True:
+            if self.grating == f"{value}":
+                break
+            else:
+                time.sleep(4)
 
     @property
     def wavelength(self):

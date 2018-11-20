@@ -46,6 +46,7 @@ class CM112(Device):
             else:
                 self.query(16, high, low)
                 time.sleep(0.1)
+                
     @property
     def grating(self):
         h,l, *_ = self.query(56, 4)
@@ -55,13 +56,15 @@ class CM112(Device):
     def grating(self, gr):
         if gr not in [1,2]:
             return
+        self.query(26, gr)
         while True:
-            if self.grating==gr:
-                break
-            else:
-                self.query(26, gr)
-                time.sleep(4)
-
+            try:
+                if self.grating==gr:
+                    break
+                time.sleep(2)
+            except:
+                pass
+            
     @property
     def port(self):
         return self._port

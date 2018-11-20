@@ -73,7 +73,7 @@ class FirmataDigitalPin(Device):
 
     @property
     def board(self):
-        return self._board
+        return self._board_type
 
     @board.setter
     def board(self, value):

@@ -5,7 +5,7 @@ from typing import Dict
 import threading
 import time
 import socket
-
+NTRIES = 5
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.connect(("8.8.8.8", 80))
 myip = s.getsockname()[0]
@@ -75,7 +75,14 @@ class DeviceClient:
         if item.startswith('_'):
             return super().__getattribute__(item)
         try:
-            resp = requests.get('{addr}/{item}'.format(addr=self._addr, item=item))
+            for _ in range(NTRIES):
+                try:
+                    resp = requests.get('{addr}/{item}'.format(addr=self._addr, item=item), timeout=120)
+                    if resp.status_code is 200:
+                        break
+                    time.sleep(2)
+                except:
+                    pass
             if resp.status_code is 200:
                 val = None
                 try:
@@ -96,7 +103,16 @@ class DeviceClient:
             super().__setattr__(key, value)
         else:
             try:
-                resp = requests.put('{addr}/{key}'.format(addr=self._addr, key=key), data={"value": value})
+                resp = requests.put('{addr}/{key}'.format(addr=self._addr, key=key), data={"value": value}, timeout=120)
+                # for _ in range(NTRIES):
+                #     try:
+                #         val = getattr(self, key)
+                #         if val == value:
+                #             break
+                #         time.sleep(2)
+                #     except:
+                #         pass
+                
                 if resp.status_code is 201:
                     val = None
                     try:
@@ -109,7 +125,9 @@ class DeviceClient:
                         pass
                     return val
                 else:
-                    raise 'Bad response from server code: {}'.format(resp.status_code)
+                    val = getattr(self, key)
+                    return val
+                    # raise 'Bad response from server code: {}'.format(resp.status_code)
             except:
                 raise AttributeError('Server unavailable.')
 
@@ -119,6 +137,7 @@ ClientDict = Dict[str, DeviceClient]
 
 class GlobalStorage:
     attributes = []
+    connected = True
 
 
 class SystemClient:
@@ -171,7 +190,7 @@ class SystemClient:
 
     def get_state(self):
         state = {}
-        for name, device in self.devices:
+        for name, device in self.devices.items():
             state[name] = {attr: getattr(device, attr) for attr in device.attributes}
         return state
 

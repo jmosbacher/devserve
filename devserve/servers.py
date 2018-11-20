@@ -5,7 +5,7 @@ import redis
 import ast
 rparser = reqparse.RequestParser()
 rparser.add_argument('value')
-
+NTRIES = 5
 
 class DeviceServer:
 
@@ -41,7 +41,9 @@ class DeviceServer:
                         setattr(self.dev, ep, val)
                         return {"name":ep, "value" : val}, 201
                     except:
-                        abort(f'{ep} is not writable.')
+                        pass
+                    else:
+                        return {"name":ep, "value" : val}, 201
                 else:
                     abort(f'No attribute named {ep}')
 

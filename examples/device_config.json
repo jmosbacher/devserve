@@ -18,6 +18,13 @@
   },
 
   {
+    "name": "source_shutter",
+    "device": "FirmataDigitalPin",
+    "com": "COM11"
+    
+  },
+
+  {
     "name": "source",
     "device": "EQ77",
     "com": "COM8"

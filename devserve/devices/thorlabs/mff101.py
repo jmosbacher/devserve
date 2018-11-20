@@ -45,7 +45,7 @@ class MFF101(Device):
 
     @property
     def port(self):
-        return self._port
+        return self._port.decode()
 
     @port.setter
     def port(self, value):
