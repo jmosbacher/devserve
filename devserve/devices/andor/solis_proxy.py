@@ -68,6 +68,16 @@ class SolisProxy(Device):
             self._saved = False
 
     @property
+    def clear_screen(self):
+        self.command("ClearScreen")
+        return 'clear'
+
+    @clear_screen.setter
+    def clear_screen(self, value):
+        if value in [True, 'clear']:
+            self.command("ClearScreen")
+
+    @property
     def saved(self):
         return self._saved
 

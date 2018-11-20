@@ -118,7 +118,7 @@ ClientDict = Dict[str, DeviceClient]
 
 
 class GlobalStorage:
-    pass
+    attributes = []
 
 
 class SystemClient:
@@ -168,6 +168,12 @@ class SystemClient:
             dev = self.devices.get(name, {})
             for attr, val in state.items():
                 setattr(dev, attr, val)
+
+    def get_state(self):
+        state = {}
+        for name, device in self.devices:
+            state[name] = {attr: getattr(device, attr) for attr in device.attributes}
+        return state
 
     def __getattr__(self, item):
         try:
