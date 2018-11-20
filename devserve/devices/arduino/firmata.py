@@ -45,13 +45,13 @@ class FirmataBoard(Device):
         try:
             import pyfirmata
             self._board = getattr(pyfirmata,self._board_type)(self._port)
-            self.connected = True
+
         except:
             self.connected = False
 
     def disconnect(self):
         self._board.exit()
-        self.connected = False
+
 
 class FirmataDigitalPin(Device):
     public = ['port', 'board', 'pin', 'on']
