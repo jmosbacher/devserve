@@ -92,7 +92,7 @@ class SolisProxy(Device):
 
     @property
     def running(self):
-        if self._running and (self.conn.read(150, timeout=0.2) == b'Done\r\n'):
+        if self._running and (self.conn.read(150) == b'Done\r\n'):
             self._running = False
         return self._running
 
@@ -145,7 +145,7 @@ class SolisProxy(Device):
     def connect(self):
         self.disconnect()
         try:
-            self.conn = serial.Serial(self._port, baudrate=self._baud, timeout=1)
+            self.conn = serial.Serial(self._port, baudrate=self._baud, timeout=0.2)
         except:
             pass
 
