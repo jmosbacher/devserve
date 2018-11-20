@@ -25,10 +25,19 @@ class FirmataBoard(Device):
             n = int(item.replace('digital', ''))
             return self._board.digital[n].read()
 
+        if item in self._apins:
+            n = int(item.replace('analog', ''))
+            return self._board.analog[n].read()
+
     def __setattr__(self, key, value):
-        if key in self._dpins and value in [0,1]:
+        if key in self._dpins and value in [0, 1]:
             n = int(key.replace('digital', ''))
             self._board.digital[n].write(value)
+
+        if key in self._dpins and (0 <= value <= 5):
+            n = int(key.replace('analog', ''))
+            self._board.analog[n].write(value)
+
         else:
             super().__setattr__(key, value)
 
@@ -40,14 +49,16 @@ class FirmataBoard(Device):
         except:
             self.connected = False
 
+
 class FirmataDigitalPin(Device):
-    public = ['port', 'pin', 'on']
+    public = ['port', 'board', 'pin', 'on']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._port = kwargs.get('com', 'COM1')
         self._board_type = kwargs.get('board', 'Arduino')
         self._pin = kwargs.get('pin', 13)
+
     @property
     def port(self):
         return self._port
@@ -56,6 +67,16 @@ class FirmataDigitalPin(Device):
     def port(self, value):
         self._port = value
         self.connect()
+
+    @property
+    def board(self):
+        return self._board
+
+    @board.setter
+    def board(self, value):
+        if value in ["Arduino", "ArduinoDue", "ArduinoMega"]:
+            self._board  = value
+            self.connect()
 
     @property
     def pin(self):

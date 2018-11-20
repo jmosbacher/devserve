@@ -125,8 +125,8 @@ class SystemClient:
 
     def __init__(self, devices: ClientDict):
         self.devices = devices
-        if "global" not in self.devices:
-            self.devices['global'] = GlobalStorage()
+        if "experiment" not in self.devices:
+            self.devices['experiment'] = GlobalStorage()
 
     @classmethod
     def from_json_file(cls, host ,path: str):

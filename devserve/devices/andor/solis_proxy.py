@@ -6,14 +6,16 @@ from ..device import Device
 class SolisProxy(Device):
     """
     Connects to a proxy script running in
-    Andor solis, written with andor basic.
+    Andor solis, written with Andor BASIC.
     """
+
     public = ['saved', 'running', 'save_path', 'grating', 'shutter',
-              'wavelength', 'exposure', 'slit_width', 'port']
+              'wavelength', 'exposure', 'slit_width', 'port', 'baud']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._port = kwargs.get('com', "COM1")
+        self._baud = kwargs.get('baud', 38400)
         self._path = kwargs.get('save_path', f"andor_file_{time.time()}")
         self._saved = False
         self._running = False
@@ -32,6 +34,16 @@ class SolisProxy(Device):
             self.connect()
         except:
             pass
+
+    @property
+    def baud(self):
+        return self._baud
+
+    @baud.setter
+    def baud(self, value):
+        if value in [4800, 9600, 14400, 19200, 38400, 57600, 115200]:
+            self._baud = value
+        self.connect()
 
     def query(self, q):
         self.conn.write(f'{q}\r'.encode())
@@ -67,7 +79,6 @@ class SolisProxy(Device):
         elif value in [0, False, 'False', 'false']:
             self._saved = False
 
-
     @property
     def shutter(self):
         return self.query("GetShutter")
@@ -75,9 +86,9 @@ class SolisProxy(Device):
     @shutter.setter
     def shutter(self, value):
         if value in [1, True, 'Open', 'open']:
-            self.command("SetShutter", 1)
+            self.command("SetShutter", "open")
         elif value in [0, False, 'Closed', 'closed']:
-            self.command("SetShutter", 0)
+            self.command("SetShutter", 'close')
 
     @property
     def running(self):
@@ -132,8 +143,9 @@ class SolisProxy(Device):
             self.command("SetSlit", value)
 
     def connect(self):
+        self.disconnect()
         try:
-            self.conn = serial.Serial(self._port, baudrate=38400, timeout=1)
+            self.conn = serial.Serial(self._port, baudrate=self._baud, timeout=1)
         except:
             pass
 
