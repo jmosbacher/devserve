@@ -49,6 +49,9 @@ class FirmataBoard(Device):
         except:
             self.connected = False
 
+    def disconnect(self):
+        self._board = None
+        self.connected = False
 
 class FirmataDigitalPin(Device):
     public = ['port', 'board', 'pin', 'on']
@@ -98,10 +101,4 @@ class FirmataDigitalPin(Device):
         elif value in ['off', 0, False]:
             self._board.digital[self._pin].write(0)
 
-    def connect(self):
-        try:
-            import pyfirmata
-            self._board = getattr(pyfirmata, self._board_type)(self._port)
-            self.connected = True
-        except:
-            self.connected = False
+
