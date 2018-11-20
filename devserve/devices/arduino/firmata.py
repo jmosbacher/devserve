@@ -50,7 +50,7 @@ class FirmataBoard(Device):
             self.connected = False
 
     def disconnect(self):
-        self._board = None
+        self._board.exit()
         self.connected = False
 
 class FirmataDigitalPin(Device):
@@ -110,5 +110,5 @@ class FirmataDigitalPin(Device):
             self.connected = False
 
     def disconnect(self):
-        self._board = None
+        self._board.exit()
         self.connected = False
