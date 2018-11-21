@@ -61,6 +61,7 @@ class FirmataDigitalPin(Device):
         self._port = kwargs.get('com', 'COM1')
         self._board_type = kwargs.get('board', 'Arduino')
         self._pin = kwargs.get('pin', 13)
+        self._board = None
 
     @property
     def port(self):
@@ -101,13 +102,20 @@ class FirmataDigitalPin(Device):
         elif value in ['off', 0, False]:
             self._board.digital[self._pin].write(0)
 
+    @property
+    def connected(self):
+        if self._board is None:
+            return False
+        else:
+            return True
+
     def connect(self):
         try:
             import pyfirmata
             self._board = getattr(pyfirmata,self._board_type)(self._port)
             self.connected = True
         except:
-            self.connected = False
+            pass
 
     def disconnect(self):
         self._board.exit()
