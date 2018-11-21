@@ -80,6 +80,7 @@ class DeviceClient:
                     resp = requests.get('{addr}/{item}'.format(addr=self._addr, item=item), timeout=120)
                     if resp.status_code is 200:
                         break
+
                     time.sleep(2)
                 except:
                     pass
@@ -95,7 +96,7 @@ class DeviceClient:
                     pass
                 return val
         except:
-            raise AttributeError('Device address unavailable.')
+            raise ConnectionError('Device address unavailable. Is the server running?')
         raise AttributeError('Attribute {} is not available'.format( item))
 
     def __setattr__(self, key, value):
@@ -104,15 +105,6 @@ class DeviceClient:
         else:
             try:
                 resp = requests.put('{addr}/{key}'.format(addr=self._addr, key=key), data={"value": value}, timeout=120)
-                # for _ in range(NTRIES):
-                #     try:
-                #         val = getattr(self, key)
-                #         if val == value:
-                #             break
-                #         time.sleep(2)
-                #     except:
-                #         pass
-                
                 if resp.status_code is 201:
                     val = None
                     try:
@@ -129,7 +121,7 @@ class DeviceClient:
                     return val
                     # raise 'Bad response from server code: {}'.format(resp.status_code)
             except:
-                raise AttributeError('Server unavailable.')
+                raise ConnectionError('Device address unavailable. Is the server running?')
 
 
 ClientDict = Dict[str, DeviceClient]
