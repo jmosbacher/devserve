@@ -5,6 +5,7 @@ from typing import Dict
 import threading
 import time
 import socket
+
 NTRIES = 5
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.connect(("8.8.8.8", 80))
@@ -181,10 +182,16 @@ class SystemClient:
         return cls(clients)
 
     def set_state(self, states: dict):
+        ts = []
         for name, state in states.items():
             dev = self.devices.get(name, {})
             for attr, val in state.items():
-                setattr(dev, attr, val)
+                t = threading.Thread(target=setattr, args=(dev, attr, val))
+                t.start()
+                ts.append(t)
+        print("running async")
+        for t in ts:
+            t.join()
 
     def get_state(self):
         state = {}

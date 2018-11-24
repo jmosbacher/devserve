@@ -26,10 +26,10 @@ class Device:
         self.disconnect()
 
 class Debugger(Device):
-    public = ['echo','random']
+    public = ['echo', 'echo2','random']
     connected = True
     _echo = 'echo'
-
+    _echo2 = 'echo2'
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -40,6 +40,14 @@ class Debugger(Device):
     @echo.setter
     def echo(self, value):
         self._echo = value
+
+    @property
+    def echo2(self):
+        return self._echo2
+
+    @echo2.setter
+    def echo2(self, value):
+        self._echo2 = value
 
     @property
     def random(self):
