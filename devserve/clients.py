@@ -5,12 +5,17 @@ from typing import Dict
 import threading
 import time
 import socket
+import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from collections import defaultdict
+
 
 NTRIES = 5
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.connect(("8.8.8.8", 80))
 myip = s.getsockname()[0]
 s.close()
+
 
 class DeviceClient:
 
@@ -134,17 +139,19 @@ class DeviceClient:
 ClientDict = Dict[str, DeviceClient]
 
 
-class GlobalStorage:
-    attributes = []
-    connected = True
-
+# class GlobalStorage:
+#     attributes = []
+#     connected = True
+#
 
 class SystemClient:
 
     def __init__(self, devices: ClientDict):
         self.devices = devices
-        if "experiment" not in self.devices:
-            self.devices['experiment'] = GlobalStorage()
+        # if "experiment" not in self.devices:
+        #     self.devices['experiment'] = GlobalStorage()
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.INFO)
 
     @classmethod
     def from_json_file(cls, host ,path: str):
@@ -164,9 +171,7 @@ class SystemClient:
         config.read(path)
         clients = {}
         for idx, name in enumerate(config.sections()):
-            cfg = dict(config[name])
-            for k,v in cfg.items():
-                cfg[k] = v.format(idx=idx, myip=myip)
+            cfg = {k:v.format(idx=idx, myip=myip) for k,v in config[name].items()}
             addr = f'http://{cfg["host"]}:{cfg["port"]}/{name}'
             c = DeviceClient(name, addr)
             clients[name] = c
@@ -181,23 +186,54 @@ class SystemClient:
             clients[cfg["name"]] = c
         return cls(clients)
 
-    def set_state(self, states: dict):
+    def set_state_async(self, states: dict):
         ts = []
         for name, state in states.items():
-            dev = self.devices.get(name, {})
+            dev = self.devices.get(name)
             for attr, val in state.items():
                 t = threading.Thread(target=setattr, args=(dev, attr, val))
                 t.start()
                 ts.append(t)
-        print("running async")
         for t in ts:
             t.join()
 
-    def get_state(self):
+    def set_state(self, states: dict):
+        for name, state in states.items():
+            dev = self.devices.get(name)
+            for attr, val in state.items():
+                setattr(dev, attr, val)
+
+    def get_state(self, fetch=None):
+        if fetch is None:
+            fetch = {name: dev.attributes for name, dev in self.devices.items()}
         state = {}
-        for name, device in self.devices.items():
-            state[name] = {attr: getattr(device, attr) for attr in device.attributes}
+        for name, attrs in fetch.items():
+            device = self.devices[name]
+            state[name] = {attr: getattr(device, attr) for attr in attrs}
         return state
+
+    def get_state_async(self, fetch=None):
+        if fetch is None:
+            fetch = {name: dev.attributes for name, dev in self.devices.items()}
+
+        with ThreadPoolExecutor(10) as pool:
+
+            futures_to_attr = {}
+            for name, attrs in fetch.items():
+                device = self.devices[name]
+                futures = {pool.submit(getattr, device, attr): (name, attr) for attr in attrs}
+                futures_to_attr.update(futures)
+
+            state = defaultdict(dict)
+            for future in as_completed(futures_to_attr):
+                name, attr = futures_to_attr[future]
+                try:
+                    val = future.result()
+                except Exception as exc:
+                    self.logger.info(f'{name}.{attr} generated an exception: {exc}')
+                else:
+                    state[name][attr] = val
+            return dict(state)
 
     def __getattr__(self, item):
         try:
