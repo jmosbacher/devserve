@@ -16,7 +16,7 @@ import serial
 
 
 class FW102C(Device):
-    public = ['position', 'speed', 'sensors', 'port', 'cached_status']
+    public = ['position', 'speed', 'sensors', 'port', 'cached_status', 'filter']
     regerr = re.compile("Command error.*")
     """
        Class to control the ThorLabs FW102C filter wheel
@@ -57,6 +57,7 @@ class FW102C(Device):
         self._port = kwargs.get('com', "COM1")
         self._fw = None
         self._status = {}
+        self._filter_map = kwargs.get('filter_map', {})
 
     def help(self):
         print( self.__doc__)
@@ -178,7 +179,17 @@ class FW102C(Device):
     def position(self, value):
         self.command(f'pos={value}')
         self._status['position'] = value
-        return self.position
+
+    @property
+    def filter(self):
+        pos = self.position
+        return self._filter_map.get(pos, None)
+
+    @filter.setter
+    def filter(self, value):
+        for pos, filter in self._filter_map.items():
+            if filter == value:
+                self.positon = pos
 
     @property
     def sensors(self):
