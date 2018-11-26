@@ -200,7 +200,6 @@ class FW102C(Device):
         if value in [0,1]:
             self.command(f'sensors={value}')
             self._status['sensors'] = value
-        
 
     @property
     def speed(self):
