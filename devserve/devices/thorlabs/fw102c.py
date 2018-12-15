@@ -210,8 +210,6 @@ class FW102C(Device):
         if value in [0,1]:
             self.command(f'speed={value}')
             self._status['speed'] = value
-       
-    
 
 # Class test, when called directly
 if __name__ == "__main__":
