@@ -5,7 +5,7 @@ from ..device import Device
 
 
 class CM112(Device):
-    public = ['wavelength', 'grating', 'port']
+    public = [ 'grating', 'wavelength', 'port']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

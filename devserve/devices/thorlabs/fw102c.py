@@ -16,7 +16,7 @@ import serial
 
 
 class FW102C(Device):
-    public = ['position', 'speed', 'sensors', 'port', 'cached_status', 'filter']
+    public = [ 'speed', 'sensors', 'port', 'cached_status', 'filter', 'position',]
     regerr = re.compile("Command error.*")
     """
        Class to control the ThorLabs FW102C filter wheel

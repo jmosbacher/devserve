@@ -10,7 +10,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from collections import defaultdict
 
 
-NTRIES = 5
+NTRIES = 1
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.connect(("8.8.8.8", 80))
 myip = s.getsockname()[0]
@@ -190,18 +190,30 @@ class SystemClient:
         ts = []
         for name, state in states.items():
             dev = self.devices.get(name)
-            for attr, val in state.items():
-                t = threading.Thread(target=setattr, args=(dev, attr, val))
-                t.start()
-                ts.append(t)
+            attrs = dev.attributes
+            for attr in attrs:
+                if attr in state:
+                    t = threading.Thread(target=setattr, args=(dev, attr, state[attr])) 
+                    t.start()
+                    ts.append(t)
+                    time.sleep(0.05)
+            # for attr, val in state.items():
+            #     t = threading.Thread(target=setattr, args=(dev, attr, val))
+            #     t.start()
+            #     ts.append(t)
         for t in ts:
             t.join()
 
     def set_state(self, states: dict):
         for name, state in states.items():
             dev = self.devices.get(name)
-            for attr, val in state.items():
-                setattr(dev, attr, val)
+            attrs = dev.attributes
+            for attr in attrs:
+                if attr in state:
+                    setattr(dev, attr, state[attr])
+
+            # for attr, val in state.items():
+            #     setattr(dev, attr, val)
 
     def get_state(self, fetch=None):
         if fetch is None:

@@ -9,8 +9,8 @@ class SolisProxy(Device):
     Andor solis, written with Andor BASIC.
     """
 
-    public = ['saved', 'running', 'save_path', 'grating', 'shutter',
-              'wavelength', 'exposure', 'slit_width', 'port', 'baud']
+    public = [ 'save_path', 'grating', 'shutter',
+              'wavelength', 'exposure', 'slit_width', 'port', 'baud', 'running', 'saved']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

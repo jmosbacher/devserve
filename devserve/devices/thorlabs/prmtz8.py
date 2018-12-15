@@ -13,7 +13,6 @@ class PRMTZ8(Device):
         self._step = kwargs.get('step', 30)
         self._make_pos_mapper()
         
-    
     def _make_pos_mapper(self):
         self._pos_mapper = {x:(-y if self._reverse else y) for x,y in zip(list(range(7,12))+list(range(7)), range(-5,7))}
 
