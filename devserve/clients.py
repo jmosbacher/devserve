@@ -135,6 +135,21 @@ class DeviceClient:
             except:
                 raise ConnectionError('Device address unavailable. Is the server running?')
 
+    def set_state(self, state: dict):
+        attrs = self.attributes
+        for attr in attrs:
+            if attr in state:
+                setattr(self, attr, state[attr])
+
+            # for attr, val in state.items():
+            #     setattr(dev, attr, val)
+
+    def get_state(self, attrs=None):
+        if attrs is None:
+            attrs = self.attributes
+       
+        state = {attr: getattr(self, attr) for attr in attrs}
+        return state
 
 ClientDict = Dict[str, DeviceClient]
 
@@ -190,30 +205,18 @@ class SystemClient:
         ts = []
         for name, state in states.items():
             dev = self.devices.get(name)
-            attrs = dev.attributes
-            for attr in attrs:
-                if attr in state:
-                    t = threading.Thread(target=setattr, args=(dev, attr, state[attr])) 
-                    t.start()
-                    ts.append(t)
-                    time.sleep(0.05)
-            # for attr, val in state.items():
-            #     t = threading.Thread(target=setattr, args=(dev, attr, val))
-            #     t.start()
-            #     ts.append(t)
+            t = threading.Thread(target=dev.set_state, args=(state,)) 
+            t.start()
+            ts.append(t)
+            time.sleep(0.05)
         for t in ts:
             t.join()
 
     def set_state(self, states: dict):
         for name, state in states.items():
             dev = self.devices.get(name)
-            attrs = dev.attributes
-            for attr in attrs:
-                if attr in state:
-                    setattr(dev, attr, state[attr])
-
-            # for attr, val in state.items():
-            #     setattr(dev, attr, val)
+            dev.set_state(state)
+  
 
     def get_state(self, fetch=None):
         if fetch is None:
@@ -221,7 +224,7 @@ class SystemClient:
         state = {}
         for name, attrs in fetch.items():
             device = self.devices[name]
-            state[name] = {attr: getattr(device, attr) for attr in attrs}
+            state[name] = device.get_state(attrs)
         return state
 
     def get_state_async(self, fetch=None):
@@ -229,22 +232,21 @@ class SystemClient:
             fetch = {name: dev.attributes for name, dev in self.devices.items()}
 
         with ThreadPoolExecutor(10) as pool:
-
-            futures_to_attr = {}
+            futures_to_name = {}
             for name, attrs in fetch.items():
                 device = self.devices[name]
-                futures = {pool.submit(getattr, device, attr): (name, attr) for attr in attrs}
-                futures_to_attr.update(futures)
+                futures = {pool.submit(device.get_state, attrs): name}
+                futures_to_name.update(futures)
 
             state = defaultdict(dict)
-            for future in as_completed(futures_to_attr):
-                name, attr = futures_to_attr[future]
+            for future in as_completed(futures_to_name):
+                name = futures_to_name[future]
                 try:
-                    val = future.result()
+                    result = future.result()
                 except Exception as exc:
-                    self.logger.info(f'{name}.{attr} generated an exception: {exc}')
+                    self.logger.info(f'{name} generated an exception: {exc}')
                 else:
-                    state[name][attr] = val
+                    state[name] = result
             return dict(state)
 
     def __getattr__(self, item):
