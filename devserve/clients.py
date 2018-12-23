@@ -18,64 +18,9 @@ s.close()
 
 
 class DeviceClient:
-
     def __init__(self, name, addr: str):
         self._name = name
         self._addr = addr
-        self._record_mode = 'None'
-        self.__recording = set()
-        self._record_delay = 10
-
-    @property
-    def _recording(self):
-        return self.__recording
-
-    @_recording.setter
-    def _recording(self, value):
-        if value in self.attributes:
-            self.__recording.add(value)
-        if len(self.__recording)==1:
-            self._thread = threading.Thread(target=self.recorder)
-            self._thread.setDaemon(True)
-            self._thread.start()
-
-    @property
-    def _stop_recording(self):
-        return set(self.attributes).difference(self.__recording)
-
-    @_stop_recording.setter
-    def _stop_recording(self, value):
-        if value in self.__recording:
-            self.__recording.remove(value)
-
-    def recorder(self):
-        from influxdb import InfluxDBClient
-        influx = InfluxDBClient(host='localhost', port=8086)
-        dbs = influx.get_list_database()
-        if "recordings" not in [d['name'] for d in dbs]:
-            influx.create_database("recordings")
-        while True:
-            if not len(self.__recording):
-                break
-            for attr in self.__recording:
-                if self._record_mode is 'influx':
-                    data = {
-                        "measurement": attr,
-                        "fields":{
-                            "name": attr,
-                            "device": self._name,
-                            "value": getattr(self, attr)
-                        }
-                    }
-                    influx.write_points([data], database="recordings")
-
-                elif self._record_mode is 'mongo':
-                    pass
-
-                elif self._record_mode is 'file':
-                    pass
-            time.sleep(self._record_delay)
-
 
     def __getattr__(self, item):
         if item.startswith('_'):
@@ -141,15 +86,69 @@ class DeviceClient:
             if attr in state:
                 setattr(self, attr, state[attr])
 
-            # for attr, val in state.items():
-            #     setattr(dev, attr, val)
-
     def get_state(self, attrs=None):
         if attrs is None:
             attrs = self.attributes
        
         state = {attr: getattr(self, attr) for attr in attrs}
         return state
+class RecordingDeviceClient(DeviceClient):
+    
+    def __init__(self, name, addr: str):
+        super().__init__(name, addr)
+        self._record_mode = 'None'
+        self.__recording = set()
+        self._record_delay = 10
+
+    @property
+    def _recording(self):
+        return self.__recording
+
+    @_recording.setter
+    def _recording(self, value):
+        if value in self.attributes:
+            self.__recording.add(value)
+        if len(self.__recording)==1:
+            self._thread = threading.Thread(target=self.recorder)
+            self._thread.setDaemon(True)
+            self._thread.start()
+
+    @property
+    def _stop_recording(self):
+        return set(self.attributes).difference(self.__recording)
+
+    @_stop_recording.setter
+    def _stop_recording(self, value):
+        if value in self.__recording:
+            self.__recording.remove(value)
+
+    def recorder(self):
+        from influxdb import InfluxDBClient
+        influx = InfluxDBClient(host='localhost', port=8086)
+        dbs = influx.get_list_database()
+        if "recordings" not in [d['name'] for d in dbs]:
+            influx.create_database("recordings")
+        while True:
+            if not len(self.__recording):
+                break
+            for attr in self.__recording:
+                if self._record_mode is 'influx':
+                    data = {
+                        "measurement": attr,
+                        "fields":{
+                            "name": attr,
+                            "device": self._name,
+                            "value": getattr(self, attr)
+                        }
+                    }
+                    influx.write_points([data], database="recordings")
+
+                elif self._record_mode is 'mongo':
+                    pass
+
+                elif self._record_mode is 'file':
+                    pass
+            time.sleep(self._record_delay)
 
 ClientDict = Dict[str, DeviceClient]
 
