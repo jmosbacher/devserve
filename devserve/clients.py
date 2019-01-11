@@ -80,6 +80,9 @@ class DeviceClient:
             except:
                 raise ConnectionError('Device address unavailable. Is the server running?')
 
+    def __dir__(self):
+        return super.__dir__() + self.attributes
+
     def set_state(self, state: dict):
         attrs = self.attributes
         for attr in attrs:
@@ -256,3 +259,6 @@ class SystemClient:
 
     def __getitem__(self, key):
         return getattr(self, key)
+
+    def __dir__(self):
+        return super.__dir__() + list(self.devices.keys())
