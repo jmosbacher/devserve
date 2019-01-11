@@ -32,7 +32,7 @@ class DeviceClient:
                     if resp.status_code is 200:
                         break
 
-                    time.sleep(2)
+                    time.sleep(0.1)
                 except:
                     pass
             if resp.status_code is 200:
