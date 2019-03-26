@@ -1,16 +1,20 @@
 import serial
 import struct
 import time
+import threading
 from ..device import Device
 
 
 class PM100(Device):
-    public = ['power', 'count', 'port', 'wavelength', 'mode', 'autorange']
+    public = ['power', 'count', 'port', 'wavelength', 'mode', 'autorange', 'recording','record_delay', 'save_path' ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._port = kwargs.get('com', "USB0::0x1313::0x8072::P2005497::INSTR")
         self.pm = None
+        self._recording = False
+        self.record_delay = 0.1
+        self.save_path = None
 
     @property
     def port(self):
@@ -87,3 +91,33 @@ class PM100(Device):
         if self.pm is not None:
             return True
         return False
+
+    @property
+    def recording(self):
+        return self._recording
+
+    @recording.setter
+    def _recording(self, value):
+        if self.recording == value:
+            return
+        elif self.recording and value==False:
+            self._recording = False
+        elif value==True:
+            self._thread = threading.Thread(target=self.recorder)
+            self._thread.setDaemon(True)
+            self._thread.start()
+
+    def recorder(self):
+        ts = []
+        ms = []
+        while self._recording:
+            t0 = time.time()
+            ms.append(self.power)
+            t1 = time.time()
+            ts.append(t0/2 + t1/2)
+            time.sleep(self.record_delay)
+        if self.save_path is not None:
+            with open(self.save_path, 'w') as f:
+                for t,m in zip(ts, ms):
+                    print(t, m, sep=',', file=f)
+            
