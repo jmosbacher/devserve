@@ -6,7 +6,7 @@ from ..device import Device
 
 
 class PM100(Device):
-    public = ['power', 'count', 'port', 'wavelength', 'mode', 'autorange', 'recording','record_delay', 'save_path' ]
+    public = ['power', 'count', 'port', 'wavelength', 'mode', 'autorange', 'recording', 'record_delay', 'save_path', 'saved' ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -14,7 +14,9 @@ class PM100(Device):
         self.pm = None
         self._recording = False
         self.record_delay = 0.1
-        self.save_path = None
+        self._save_path = None
+        self._saved = False
+        self._cache = {"ts":[], "ms": []}
 
     @property
     def port(self):
@@ -108,16 +110,37 @@ class PM100(Device):
             self._thread.start()
 
     def recorder(self):
-        ts = []
-        ms = []
+        ts = self._cache['ts']
+        ms = self._cache['ms']
         while self._recording:
             t0 = time.time()
             ms.append(self.power)
             t1 = time.time()
             ts.append(t0/2 + t1/2)
             time.sleep(self.record_delay)
-        if self.save_path is not None:
-            with open(self.save_path, 'w') as f:
-                for t,m in zip(ts, ms):
-                    print(t, m, sep=',', file=f)
             
+    @property
+    def save_path(self):
+        return self._save_path
+
+    @save_path.setter
+    def save_path(self, path):
+        self._save_path = path
+        self._saved = False
+
+    @property
+    def saved(self):
+        return self._saved
+
+    @saved.setter
+    def saved(self, value):
+        if self.save_path is None:
+            return
+        ts = self._cache['ts']
+        ms = self._cache['ts']
+        with open(self.save_path, 'w') as f:
+            for t,m in zip(ts, ms):
+                print(t, m, sep=',', file=f) 
+        self._saved = True
+        self._cache['ts'] = []
+        self._cache['ts'] = []
