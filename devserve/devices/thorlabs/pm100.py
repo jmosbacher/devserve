@@ -99,15 +99,16 @@ class PM100(Device):
         return self._recording
 
     @recording.setter
-    def _recording(self, value):
-        if self.recording == value:
+    def recording(self, value):
+        if self._recording == value:
             return
-        elif self.recording and value==False:
+        elif self._recording and value==False:
             self._recording = False
         elif value==True:
             self._thread = threading.Thread(target=self.recorder)
             self._thread.setDaemon(True)
             self._thread.start()
+            self._recording = True
 
     def recorder(self):
         ts = self._cache['ts']
