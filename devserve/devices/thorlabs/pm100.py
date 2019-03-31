@@ -13,7 +13,7 @@ class PM100(Device):
         self._port = kwargs.get('com', "USB0::0x1313::0x8072::P2005497::INSTR")
         self.pm = None
         self._recording = False
-        self.record_delay = 0.1
+        self.record_delay = 0.05
         self._save_path = None
         self._saved = False
         self._cache = {"ts":[], "ms": []}

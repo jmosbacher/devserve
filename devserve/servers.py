@@ -7,22 +7,13 @@ rparser = reqparse.RequestParser()
 rparser.add_argument('value')
 NTRIES = 5
 
-class DeviceServer:
+class RestfulDevice(Resource):
+            # dev = self.device
+            # attrs = dev.public + dev._common
+            def __init__(self, **kwargs):
+                self.device = kwargs['device'] 
+                self.attrs = self.device.public + self.device._common
 
-    def __init__(self, name, host, port, device, rs=None):
-        self.name = name
-        self.host = host
-        self.port = port
-        self.device = device
-        self.rs = rs
-        
-    def run(self, debug=False):
-        app = Flask(__name__)
-        api = Api(app)
-
-        class RestfulDevice(Resource):
-            dev = self.device
-            attrs = dev.public + dev._common
             def get(self, ep):
                 if ep in self.attrs:
                     val = getattr(self.dev, ep)
@@ -46,8 +37,20 @@ class DeviceServer:
                         return {"name":ep, "value" : val}, 201
                 else:
                     abort(f'No attribute named {ep}')
+class DeviceServer:
 
-        api.add_resource(RestfulDevice, f'/{self.name}/<ep>')
+    def __init__(self, name, host, port, device, rs=None):
+        self.name = name
+        self.host = host
+        self.port = port
+        self.device = device
+        self.rs = rs
+        
+    def run(self, debug=False):
+        app = Flask(__name__)
+        api = Api(app)
+        api.add_resource(RestfulDevice, f'/{self.name}/<ep>',
+                    resource_class_kwargs={"device": self.device})
 
         try:
             self.device.connect()
