@@ -81,7 +81,7 @@ class DeviceClient:
                 raise ConnectionError('Device address unavailable. Is the server running?')
 
     def __dir__(self):
-        return super.__dir__() + self.attributes
+        return super().__dir__() + self.attributes
 
     def set_state(self, state: dict):
         attrs = self.attributes
@@ -261,4 +261,4 @@ class SystemClient:
         return getattr(self, key)
 
     def __dir__(self):
-        return super.__dir__() + list(self.devices.keys())
+        return super().__dir__() + list(self.devices.keys())

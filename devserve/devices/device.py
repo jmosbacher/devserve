@@ -16,7 +16,7 @@ class Device:
 
     @property
     def attributes(self):
-        return self.public
+        return self.public + self._common
 
     def __enter__(self):
         self.connect()
