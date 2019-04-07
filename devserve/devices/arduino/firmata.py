@@ -34,7 +34,7 @@ class FirmataBoard(Device):
             n = int(key.replace('digital', ''))
             self._board.digital[n].write(value)
 
-        if key in self._dpins and (0 <= value <= 5):
+        if key in self._apins and (0 <= value <= 5):
             n = int(key.replace('analog', ''))
             self._board.analog[n].write(value)
 
