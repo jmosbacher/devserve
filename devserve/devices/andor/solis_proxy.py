@@ -3,14 +3,20 @@ import struct
 import time
 from ..device import Device
 import ast
+
 class SolisProxy(Device):
     """
     Connects to a proxy script running in
     Andor solis, written with Andor BASIC.
     """
 
-    public = [ 'save_path', 'grating', 'shutter',
-              'wavelength', 'exposure', 'slit_width', 'port', 'baud', 'running', 'saved']
+    public = [  'pixel_wl',    'npixel_h',       'npixel_v', # Hardware properties
+                    'port',        'baud',                   # Connection properties
+                 'grating',     'shutter',                   # Device configuration
+                'exposure',  'slit_width',                   # .
+              'wavelength',      'min_wl',         'max_wl', # .
+               'save_path', 'carea_wlmin',    'carea_wlmax', # Data management
+                 'running',       'saved', 'corrected_area'] # Operations
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -20,6 +26,32 @@ class SolisProxy(Device):
         self._saved = False
         self._running = False
         self.conn = None
+
+        self._pixel_wl =    0.523955
+        self._npixel_h = 1600
+        self._npixel_v =  400
+
+        self._carea_range = [-1, -1] # Must be mutable!
+
+    @property
+    def pixel_wl(self):
+        return self._pixel_wl
+
+    @property
+    def npixel_h(self):
+        return self._npixel_h
+
+    @property
+    def npixel_v(self):
+        return self._npixel_v
+
+    @property
+    def min_wl(self):
+        return self.wavelength - self.pixel_wl * self.npixel_h // 2
+
+    @property
+    def max_wl(self):
+        return self.wavelength + self.pixel_wl * self.npixel_h // 2
 
     @property
     def port(self):
@@ -164,6 +196,31 @@ class SolisProxy(Device):
         if (2500 >= value >=10):
             self.command("SetSlit", value)
 
+    def _pixel_number(self, wl):
+        return 1 + int(round((wl - self.min_wl) / self.pixel_wl))
+
+    @property
+    def carea_wlmin(self):
+        return self._carea_range[0]
+
+    @property
+    def carea_wlmax(self):
+        return self._carea_range[1]
+
+    @carea_wlmin.setter
+    def carea_wlmin(self, value):
+        self._carea_range[0] = self._pixel_number(value)
+
+    @carea_wlmax.setter
+    def carea_wlmax(self, value):
+        self._carea_range[1] = self._pixel_number(value)
+
+    @property
+    def corrected_area(self):
+        pmin, pmax = self._carea_range
+        response = self.query(f"CArea\r{pmin}\r{pmax}")
+        return float(response)
+
     def connect(self):
         self.disconnect()
         try:
@@ -180,4 +237,3 @@ class SolisProxy(Device):
     def disconnect(self):
         if self.connected:
             self.conn.close()
-            
