@@ -28,7 +28,7 @@ class DeviceClient:
         try:
             for _ in range(NTRIES):
                 try:
-                    resp = requests.get('{addr}/{item}'.format(addr=self._addr, item=item), timeout=120)
+                    resp = requests.get('{addr}/{item}'.format(addr=self._addr, item=item), timeout=300)
                     if resp.status_code is 200:
                         break
 
@@ -61,7 +61,7 @@ class DeviceClient:
             super().__setattr__(key, value)
         else:
             try:
-                resp = requests.put('{addr}/{key}'.format(addr=self._addr, key=key), data={"value": value}, timeout=120)
+                resp = requests.put('{addr}/{key}'.format(addr=self._addr, key=key), data={"value": value}, timeout=300)
                 if resp.status_code is 201:
                     val = None
                     try:
