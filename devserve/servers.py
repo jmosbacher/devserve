@@ -16,7 +16,7 @@ class RestfulDevice(Resource):
 
             def get(self, ep):
                 if ep in self.attrs:
-                    val = getattr(self.dev, ep)
+                    val = getattr(self.device, ep)
                     return {"name":ep, "value" : val}
                 else:
                     abort(f'No attribute named {ep}')
@@ -29,7 +29,7 @@ class RestfulDevice(Resource):
                     except:
                         val = args['value']
                     try:
-                        setattr(self.dev, ep, val)
+                        setattr(self.device, ep, val)
                         return {"name":ep, "value" : val}, 201
                     except:
                         pass
