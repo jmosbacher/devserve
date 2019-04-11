@@ -6,7 +6,12 @@ from ..device import Device
 
 
 class PM100(Device):
-    public = ['power', 'count', 'port', 'wavelength', 'mode', 'autorange', 'recording', 'record_delay', 'save_path', 'saved' ]
+    public = [     'port',                                 # Connection properties
+                  'count',   'wavelength',                 # Device configuration
+                   'mode',    'autorange', 'record_delay', # .
+              'save_path', 'buffer_stats',                 # Data manipulation
+                  'power',    'recording',        'saved'] # Operations
+
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -143,3 +148,15 @@ class PM100(Device):
             for t,m in zip(ts, ms):
                 print(t, m, sep=',', file=f) 
         self._saved = True
+
+    @property
+    def buffer_stats(self):
+        t = self._cache['ts']
+        p = self._cache['ms']
+
+        n_meas = len    (t)
+        t_mean = np.mean(t)
+        p_mean = np.mean(p)
+        p_std  = np.std (p)
+
+        return n_meas, t_mean, p_mean, p_std
