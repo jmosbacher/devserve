@@ -138,7 +138,7 @@ class PM100(Device):
         if self.save_path is None:
             return
         ts = self._cache['ts']
-        ms = self._cache['ts']
+        ms = self._cache['ms']
         with open(self.save_path, 'w') as f:
             for t,m in zip(ts, ms):
                 print(t, m, sep=',', file=f) 
