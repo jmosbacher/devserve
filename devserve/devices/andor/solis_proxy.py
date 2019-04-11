@@ -9,6 +9,7 @@ class SolisProxy(Device):
     Connects to a proxy script running in
     Andor solis, written with Andor BASIC.
     """
+    _valid_baud = [4800, 9600, 14400, 19200, 38400, 57600, 115200]
 
     public = [  'pixel_wl',    'npixel_h',       'npixel_v', # Hardware properties
                     'port',        'baud',                   # Connection properties
@@ -73,8 +74,10 @@ class SolisProxy(Device):
 
     @baud.setter
     def baud(self, value):
-        if value in [4800, 9600, 14400, 19200, 38400, 57600, 115200]:
-            self._baud = value
+        if value not in self._valid_baud:
+            raise ValueError(f"Invalid baud rate: {baud}. Valud must be one of {self._valid_baud}")
+
+        self._baud = value
         self.connect()
 
     def query(self, q):
@@ -96,10 +99,12 @@ class SolisProxy(Device):
         return self._path
 
     @save_path.setter
-    def save_path(self, value):
-        if isinstance(value, str):
-            self._path = value
-            self._saved = False
+    def save_path(self, path):
+        if not isinstance(path, str):
+            raise ValueError(f"`path` must be a str, got {type(value)}")
+
+        self._path  = value
+        self._saved = False
 
     @property
     def clear_screen(self):
@@ -108,8 +113,10 @@ class SolisProxy(Device):
 
     @clear_screen.setter
     def clear_screen(self, value):
-        if value in [True, 'clear']:
-            self.command("ClearScreen")
+        if value not in [1, True, 'clear']:
+            raise ValueError(f"Unrecognized value {value}")
+
+        self.command("ClearScreen")
 
     @property
     def saved(self):
@@ -117,11 +124,13 @@ class SolisProxy(Device):
 
     @saved.setter
     def saved(self, value):
-        if value in [1, True, 'True', 'true']:
+        if   value in [1,  True,  'True',  'true']:
             self.command("Save", self._path)
             self._saved = True
         elif value in [0, False, 'False', 'false']:
             self._saved = False
+        else:
+            raise ValueError(f"Unrecognized save value {value}")
 
     @property
     def shutter(self):
@@ -133,8 +142,10 @@ class SolisProxy(Device):
             self.command("SetShutter", "open")
         elif value in [0, False, 'Closed', 'closed']:
             self.command("SetShutter", 'close')
-        else:
+        elif value in ["auto", "Auto"]:
             self.command("SetShutter", 'auto')
+        else:
+            raise ValueError(f"Unrecognized shutter value {value}")
 
     @property
     def running(self):
@@ -142,7 +153,8 @@ class SolisProxy(Device):
 
     @running.setter
     def running(self, running):
-        if running not in [1, True, 'True']: return
+        if running not in [1, True, 'True']:
+            raise ValueError(f"Unrecognized running status {running}")
 
         self.command('Run')
         while True:
@@ -162,8 +174,10 @@ class SolisProxy(Device):
 
     @grating.setter
     def grating(self, value):
-        if value in [1, 2]:
-            self.command("SetGrating", value)
+        if value not in [1, 2]:
+            raise ValueError(f"Invalid grating number: {value}")
+
+        self.command("SetGrating", value)
         while True:
             if self.grating == f"{value}":
                 break
@@ -176,8 +190,10 @@ class SolisProxy(Device):
 
     @wavelength.setter
     def wavelength(self, value):
-        if (2000 >= value >= 200):
-            self.command("SetWavelength", value)
+        if not 2000 >= value >= 200:
+            raise ValueError(f"Invalid wavelength {value}. Must be between 200 and 2000 nm")
+
+        self.command("SetWavelength", value)
 
     @property
     def exposure(self):
@@ -193,8 +209,10 @@ class SolisProxy(Device):
 
     @slit_width.setter
     def slit_width(self, value):
-        if (2500 >= value >=10):
-            self.command("SetSlit", value)
+        if not 2500 >= value >= 10:
+            raise ValueError(f"Invalid slit width {value}. Must be between 10 and 2500 µm")
+
+        self.command("SetSlit", value)
 
     def _pixel_number(self, wl):
         return 1 + int(round((wl - self.min_wl) / self.pixel_wl))
