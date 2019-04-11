@@ -107,8 +107,8 @@ class PM100(Device):
         elif value==True:
             self._thread = threading.Thread(target=self.recorder)
             self._thread.setDaemon(True)
-            self._thread.start()
             self._recording = True
+            self._thread.start()
 
     def recorder(self):
         ts = self._cache['ts']
