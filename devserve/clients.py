@@ -170,6 +170,14 @@ class SystemClient:
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.INFO)
 
+        for device_name, device in self.devices.items():
+            if not device.connected:
+                # Try to reconnect again
+                device.port = device.port
+            if not device.connected:
+                # Give up
+                print(f"Device {device_name} is not connected")
+
     @classmethod
     def from_json_file(cls, host ,path: str):
         with open(path, "r") as f:
