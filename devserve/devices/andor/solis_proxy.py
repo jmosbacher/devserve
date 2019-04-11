@@ -53,6 +53,7 @@ class SolisProxy(Device):
 
     def command(self, cmd, *args):
         self.conn.write(f'{cmd}\r'.encode())
+        time.sleep(0.01)
         self.conn.read(150)
         for arg in args:
             self.conn.write(f'{arg}\r'.encode())
