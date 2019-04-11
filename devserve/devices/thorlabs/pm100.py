@@ -111,15 +111,15 @@ class PM100(Device):
             self._thread.start()
 
     def recorder(self):
-        ts = self._cache['ts']
-        ms = self._cache['ms']
+        ts = self._cache['ts'] = []
+        ms = self._cache['ms'] = []
         while self._recording:
             t0 = time.time()
             ms.append(self.power)
             t1 = time.time()
             ts.append(t0/2 + t1/2)
             time.sleep(self.record_delay)
-            
+
     @property
     def save_path(self):
         return self._save_path
@@ -143,5 +143,3 @@ class PM100(Device):
             for t,m in zip(ts, ms):
                 print(t, m, sep=',', file=f) 
         self._saved = True
-        self._cache['ts'] = []
-        self._cache['ts'] = []
