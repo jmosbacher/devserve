@@ -106,20 +106,23 @@ class SolisProxy(Device):
 
     @property
     def running(self):
-        if self._running and (self.conn.read(150) == b'Done\r\n'):
-            self._running = False
-        return self._running
+        return False
 
     @running.setter
     def running(self, running):
-        # if running not in [True, False]:
-        #     return
-        if self._running:
-            return
-        elif running in [1, True, 'True']:
-            self.command('Run')
-            self._running = True
-            self._saved = False
+        if running not in [1, True, 'True']: return
+
+        self.command('Run')
+        while True:
+            try:
+                if self.conn.read(150) == b"Done\r\n":
+                    break
+            except:
+                pass
+
+            time.sleep(0.2)
+
+        self._saved = False
 
     @property
     def grating(self):
