@@ -6,7 +6,12 @@ from ..device import Device
 
 
 class PM100(Device):
-    public = ['power', 'count', 'port', 'wavelength', 'mode', 'autorange', 'recording', 'record_delay', 'save_path', 'saved' ]
+    public = [     'port',                                 # Connection properties
+                  'count',   'wavelength',                 # Device configuration
+                   'mode',    'autorange', 'record_delay', # .
+              'save_path', 'buffer_stats',                 # Data manipulation
+                  'power',    'recording',        'saved'] # Operations
+
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -107,19 +112,19 @@ class PM100(Device):
         elif value==True:
             self._thread = threading.Thread(target=self.recorder)
             self._thread.setDaemon(True)
-            self._thread.start()
             self._recording = True
+            self._thread.start()
 
     def recorder(self):
-        ts = self._cache['ts']
-        ms = self._cache['ms']
+        ts = self._cache['ts'] = []
+        ms = self._cache['ms'] = []
         while self._recording:
             t0 = time.time()
             ms.append(self.power)
             t1 = time.time()
             ts.append(t0/2 + t1/2)
             time.sleep(self.record_delay)
-            
+
     @property
     def save_path(self):
         return self._save_path
@@ -138,10 +143,20 @@ class PM100(Device):
         if self.save_path is None:
             return
         ts = self._cache['ts']
-        ms = self._cache['ts']
+        ms = self._cache['ms']
         with open(self.save_path, 'w') as f:
             for t,m in zip(ts, ms):
                 print(t, m, sep=',', file=f) 
         self._saved = True
-        self._cache['ts'] = []
-        self._cache['ts'] = []
+
+    @property
+    def buffer_stats(self):
+        t = self._cache['ts']
+        p = self._cache['ms']
+
+        n_meas = len    (t)
+        t_mean = np.mean(t)
+        p_mean = np.mean(p)
+        p_std  = np.std (p)
+
+        return n_meas, t_mean, p_mean, p_std

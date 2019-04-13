@@ -28,7 +28,7 @@ class DeviceClient:
         try:
             for _ in range(NTRIES):
                 try:
-                    resp = requests.get('{addr}/{item}'.format(addr=self._addr, item=item), timeout=120)
+                    resp = requests.get('{addr}/{item}'.format(addr=self._addr, item=item), timeout=300)
                     if resp.status_code is 200:
                         break
 
@@ -51,7 +51,7 @@ class DeviceClient:
         raise AttributeError('Attribute {} is not available'.format( item))
 
     def __setitem__(self, key, value):
-        setattr(self, key)
+        setattr(self, key, value)
 
     def __getitem__(self, key):
         return getattr(self, key)
@@ -61,7 +61,7 @@ class DeviceClient:
             super().__setattr__(key, value)
         else:
             try:
-                resp = requests.put('{addr}/{key}'.format(addr=self._addr, key=key), data={"value": value}, timeout=120)
+                resp = requests.put('{addr}/{key}'.format(addr=self._addr, key=key), data={"value": value}, timeout=300)
                 if resp.status_code is 201:
                     val = None
                     try:
@@ -169,6 +169,14 @@ class SystemClient:
         #     self.devices['experiment'] = GlobalStorage()
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.INFO)
+
+        for device_name, device in self.devices.items():
+            if not device.connected:
+                # Try to reconnect again
+                device.port = device.port
+            if not device.connected:
+                # Give up
+                print(f"Device {device_name} is not connected")
 
     @classmethod
     def from_json_file(cls, host ,path: str):

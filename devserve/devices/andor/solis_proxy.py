@@ -3,14 +3,21 @@ import struct
 import time
 from ..device import Device
 import ast
+
 class SolisProxy(Device):
     """
     Connects to a proxy script running in
     Andor solis, written with Andor BASIC.
     """
+    _valid_baud = [4800, 9600, 14400, 19200, 38400, 57600, 115200]
 
-    public = [ 'save_path', 'grating', 'shutter',
-              'wavelength', 'exposure', 'slit_width', 'port', 'baud', 'running', 'saved']
+    public = [  'pixel_wl',    'npixel_h',       'npixel_v', # Hardware properties
+                    'port',        'baud',                   # Connection properties
+                 'grating',     'shutter',                   # Device configuration
+                'exposure',  'slit_width',                   # .
+              'wavelength',      'min_wl',         'max_wl', # .
+               'save_path', 'carea_wlmin',    'carea_wlmax', # Data management
+                 'running',       'saved', 'corrected_area'] # Operations
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -20,6 +27,32 @@ class SolisProxy(Device):
         self._saved = False
         self._running = False
         self.conn = None
+
+        self._pixel_wl =    0.523955
+        self._npixel_h = 1600
+        self._npixel_v =  400
+
+        self._carea_range = [-1, -1] # Must be mutable!
+
+    @property
+    def pixel_wl(self):
+        return self._pixel_wl
+
+    @property
+    def npixel_h(self):
+        return self._npixel_h
+
+    @property
+    def npixel_v(self):
+        return self._npixel_v
+
+    @property
+    def min_wl(self):
+        return self.wavelength - self.pixel_wl * self.npixel_h // 2
+
+    @property
+    def max_wl(self):
+        return self.wavelength + self.pixel_wl * self.npixel_h // 2
 
     @property
     def port(self):
@@ -41,8 +74,10 @@ class SolisProxy(Device):
 
     @baud.setter
     def baud(self, value):
-        if value in [4800, 9600, 14400, 19200, 38400, 57600, 115200]:
-            self._baud = value
+        if value not in self._valid_baud:
+            raise ValueError(f"Invalid baud rate: {baud}. Valud must be one of {self._valid_baud}")
+
+        self._baud = value
         self.connect()
 
     def query(self, q):
@@ -53,6 +88,7 @@ class SolisProxy(Device):
 
     def command(self, cmd, *args):
         self.conn.write(f'{cmd}\r'.encode())
+        time.sleep(0.01)
         self.conn.read(150)
         for arg in args:
             self.conn.write(f'{arg}\r'.encode())
@@ -63,10 +99,12 @@ class SolisProxy(Device):
         return self._path
 
     @save_path.setter
-    def save_path(self, value):
-        if isinstance(value, str):
-            self._path = value
-            self._saved = False
+    def save_path(self, path):
+        if not isinstance(path, str):
+            raise ValueError(f"`path` must be a str, got {type(value)}")
+
+        self._path  = value
+        self._saved = False
 
     @property
     def clear_screen(self):
@@ -75,8 +113,10 @@ class SolisProxy(Device):
 
     @clear_screen.setter
     def clear_screen(self, value):
-        if value in [True, 'clear']:
-            self.command("ClearScreen")
+        if value not in [1, True, 'clear']:
+            raise ValueError(f"Unrecognized value {value}")
+
+        self.command("ClearScreen")
 
     @property
     def saved(self):
@@ -84,11 +124,13 @@ class SolisProxy(Device):
 
     @saved.setter
     def saved(self, value):
-        if value in [1, True, 'True', 'true']:
+        if   value in [1,  True,  'True',  'true']:
             self.command("Save", self._path)
             self._saved = True
         elif value in [0, False, 'False', 'false']:
             self._saved = False
+        else:
+            raise ValueError(f"Unrecognized save value {value}")
 
     @property
     def shutter(self):
@@ -100,25 +142,31 @@ class SolisProxy(Device):
             self.command("SetShutter", "open")
         elif value in [0, False, 'Closed', 'closed']:
             self.command("SetShutter", 'close')
-        else:
+        elif value in ["auto", "Auto"]:
             self.command("SetShutter", 'auto')
+        else:
+            raise ValueError(f"Unrecognized shutter value {value}")
 
     @property
     def running(self):
-        if self._running and (self.conn.read(150) == b'Done\r\n'):
-            self._running = False
-        return self._running
+        return False
 
     @running.setter
     def running(self, running):
-        # if running not in [True, False]:
-        #     return
-        if self._running:
-            return
-        elif running in [1, True, 'True']:
-            self.command('Run')
-            self._running = True
-            self._saved = False
+        if running not in [1, True, 'True']:
+            raise ValueError(f"Unrecognized running status {running}")
+
+        self.command('Run')
+        while True:
+            try:
+                if self.conn.read(150) == b"Done\r\n":
+                    break
+            except:
+                pass
+
+            time.sleep(0.2)
+
+        self._saved = False
 
     @property
     def grating(self):
@@ -126,8 +174,10 @@ class SolisProxy(Device):
 
     @grating.setter
     def grating(self, value):
-        if value in [1, 2]:
-            self.command("SetGrating", value)
+        if value not in [1, 2]:
+            raise ValueError(f"Invalid grating number: {value}")
+
+        self.command("SetGrating", value)
         while True:
             if self.grating == f"{value}":
                 break
@@ -136,12 +186,14 @@ class SolisProxy(Device):
 
     @property
     def wavelength(self):
-        return self.query("GetWavelength")
+        return float(self.query("GetWavelength"))
 
     @wavelength.setter
     def wavelength(self, value):
-        if (2000 >= value >= 200):
-            self.command("SetWavelength", value)
+        if not 2000 >= value >= 200:
+            raise ValueError(f"Invalid wavelength {value}. Must be between 200 and 2000 nm")
+
+        self.command("SetWavelength", value)
 
     @property
     def exposure(self):
@@ -157,8 +209,35 @@ class SolisProxy(Device):
 
     @slit_width.setter
     def slit_width(self, value):
-        if (2500 >= value >=10):
-            self.command("SetSlit", value)
+        if not 2500 >= value >= 10:
+            raise ValueError(f"Invalid slit width {value}. Must be between 10 and 2500 µm")
+
+        self.command("SetSlit", value)
+
+    def _pixel_number(self, wl):
+        return 1 + int(round((wl - self.min_wl) / self.pixel_wl))
+
+    @property
+    def carea_wlmin(self):
+        return self._carea_range[0]
+
+    @property
+    def carea_wlmax(self):
+        return self._carea_range[1]
+
+    @carea_wlmin.setter
+    def carea_wlmin(self, value):
+        self._carea_range[0] = self._pixel_number(value)
+
+    @carea_wlmax.setter
+    def carea_wlmax(self, value):
+        self._carea_range[1] = self._pixel_number(value)
+
+    @property
+    def corrected_area(self):
+        pmin, pmax = self._carea_range
+        response = self.query(f"CArea\r{pmin}\r{pmax}")
+        return float(response)
 
     def connect(self):
         self.disconnect()
@@ -176,4 +255,3 @@ class SolisProxy(Device):
     def disconnect(self):
         if self.connected:
             self.conn.close()
-            
