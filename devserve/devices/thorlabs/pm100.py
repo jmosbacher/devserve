@@ -2,6 +2,9 @@ import serial
 import struct
 import time
 import threading
+
+import numpy as np
+
 from ..device import Device
 
 
