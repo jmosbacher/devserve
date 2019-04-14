@@ -75,7 +75,7 @@ class SolisProxy(Device):
     @baud.setter
     def baud(self, value):
         if value not in self._valid_baud:
-            raise ValueError(f"Invalid baud rate: {baud}. Valud must be one of {self._valid_baud}")
+            raise ValueError(f"Invalid baud rate: {value}. Valud must be one of {self._valid_baud}")
 
         self._baud = value
         self.connect()
@@ -101,9 +101,9 @@ class SolisProxy(Device):
     @save_path.setter
     def save_path(self, path):
         if not isinstance(path, str):
-            raise ValueError(f"`path` must be a str, got {type(value)}")
+            raise ValueError(f"`path` must be a str, got {type(path)}")
 
-        self._path  = value
+        self._path  =  path
         self._saved = False
 
     @property
