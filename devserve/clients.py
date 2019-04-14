@@ -262,7 +262,7 @@ class SystemClient:
                     self.logger.info(f'{name} generated an exception: {exc}')
                 else:
                     state[name] = result
-            return dict(state)
+        return dict(state)
 
     def __getattr__(self, item):
         try:
