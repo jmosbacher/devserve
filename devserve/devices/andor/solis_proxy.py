@@ -11,13 +11,14 @@ class SolisProxy(Device):
     """
     _valid_baud = [4800, 9600, 14400, 19200, 38400, 57600, 115200]
 
-    public = [  'pixel_wl',    'npixel_h',       'npixel_v', # Hardware properties
-                    'port',        'baud',                   # Connection properties
-                 'grating',     'shutter',                   # Device configuration
-                'exposure',  'slit_width',                   # .
-              'wavelength',      'min_wl',         'max_wl', # .
-               'save_path', 'carea_wlmin',    'carea_wlmax', # Data management
-                 'running',       'saved', 'corrected_area'] # Operations
+    public = [    'pixel_wl',    'npixel_h',       'npixel_v', # Hardware properties
+                      'port',        'baud',                   # Connection properties
+                   'grating',     'shutter',                   # Device configuration
+                  'exposure',  'slit_width',                   # .
+                'wavelength',      'min_wl',         'max_wl', # .
+                 'save_path', 'carea_wlmin',    'carea_wlmax', # Data management
+                   'running',       'saved', 'corrected_area', # Operations
+              'clear_screen']                                  # .
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
