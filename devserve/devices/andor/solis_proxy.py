@@ -114,7 +114,7 @@ class SolisProxy(Device):
 
     @clear_screen.setter
     def clear_screen(self, value):
-        if value not in [1, True, 'clear']:
+        if value not in [1, True, 'True', 'clear']:
             raise ValueError(f"Unrecognized value {value}")
 
         self.command("ClearScreen")
