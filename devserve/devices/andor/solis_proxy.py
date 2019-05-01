@@ -11,13 +11,14 @@ class SolisProxy(Device):
     """
     _valid_baud = [4800, 9600, 14400, 19200, 38400, 57600, 115200]
 
-    public = [  'pixel_wl',    'npixel_h',       'npixel_v', # Hardware properties
-                    'port',        'baud',                   # Connection properties
-                 'grating',     'shutter',                   # Device configuration
-                'exposure',  'slit_width',                   # .
-              'wavelength',      'min_wl',         'max_wl', # .
-               'save_path', 'carea_wlmin',    'carea_wlmax', # Data management
-                 'running',       'saved', 'corrected_area'] # Operations
+    public = [    'pixel_wl',    'npixel_h',       'npixel_v', # Hardware properties
+                      'port',        'baud',                   # Connection properties
+                   'grating',     'shutter',                   # Device configuration
+                  'exposure',  'slit_width',                   # .
+                'wavelength',      'min_wl',         'max_wl', # .
+                 'save_path', 'carea_wlmin',    'carea_wlmax', # Data management
+                   'running',       'saved', 'corrected_area', # Operations
+              'clear_screen']                                  # .
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -75,7 +76,7 @@ class SolisProxy(Device):
     @baud.setter
     def baud(self, value):
         if value not in self._valid_baud:
-            raise ValueError(f"Invalid baud rate: {baud}. Valud must be one of {self._valid_baud}")
+            raise ValueError(f"Invalid baud rate: {value}. Valud must be one of {self._valid_baud}")
 
         self._baud = value
         self.connect()
@@ -101,9 +102,9 @@ class SolisProxy(Device):
     @save_path.setter
     def save_path(self, path):
         if not isinstance(path, str):
-            raise ValueError(f"`path` must be a str, got {type(value)}")
+            raise ValueError(f"`path` must be a str, got {type(path)}")
 
-        self._path  = value
+        self._path  =  path
         self._saved = False
 
     @property
@@ -113,7 +114,7 @@ class SolisProxy(Device):
 
     @clear_screen.setter
     def clear_screen(self, value):
-        if value not in [1, True, 'clear']:
+        if value not in [1, True, 'True', 'clear']:
             raise ValueError(f"Unrecognized value {value}")
 
         self.command("ClearScreen")
