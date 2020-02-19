@@ -20,8 +20,10 @@
   {
     "name": "source_shutter",
     "device": "FirmataDigitalPin",
-    "com": "COM11"
-    
+    "com": "COM11",
+    "pin": 13,
+    "control_pin": 12,
+    "control": "camera"
   },
 
   {
