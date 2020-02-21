@@ -61,10 +61,10 @@ class FirmataDigitalPin(Device):
         self._port = kwargs.get('com', 'COM1')
         self._board_type = kwargs.get('board', 'Arduino')
         self._pin = kwargs.get('pin', 13)
-        self._control_pin = kwargs.get('control_pin', 12)
         self._board = None
 
-        self._control = kwargs.get("control", "camera")
+        self._control_pin = kwargs.get('control_pin', 12)
+        self._control     = kwargs.get("control", "camera")
 
     @property
     def port(self):
@@ -144,6 +144,10 @@ class FirmataDigitalPin(Device):
             import pyfirmata
             self._board = getattr(pyfirmata,self._board_type)(self._port)
             self.connected = True
+
+            self.control_pin = self._control_pin
+            self.control     = self._control
+
         except:
             pass
 
