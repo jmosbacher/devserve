@@ -10,7 +10,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from collections import defaultdict
 
 
-NTRIES = 1
+NTRIES = 3
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.connect(("8.8.8.8", 80))
 myip = s.getsockname()[0]
@@ -28,7 +28,7 @@ class DeviceClient:
         try:
             for _ in range(NTRIES):
                 try:
-                    resp = requests.get('{addr}/{item}'.format(addr=self._addr, item=item), timeout=300)
+                    resp = requests.get('{addr}/{item}'.format(addr=self._addr, item=item), timeout=30)
                     if resp.status_code is 200:
                         break
 
