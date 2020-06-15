@@ -187,7 +187,7 @@ class SolisProxy(Device):
 
     @property
     def wavelength(self):
-        return float(self.query("GetWavelength"))
+        return float(self.query("GetWavelength").split("\r")[0])
 
     @wavelength.setter
     def wavelength(self, value):
