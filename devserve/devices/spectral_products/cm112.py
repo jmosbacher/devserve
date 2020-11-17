@@ -5,12 +5,14 @@ from ..device import Device
 
 
 class CM112(Device):
-    public = [ 'grating', 'wavelength', 'port']
+    public = [ 'grating', 'wavelength', 'port', "zero", "calibrate",
+                  "increment", "decrement", "increment_m2", "decrement_m2" ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._port = kwargs.get('com', "COM1")
         self.conn = None
+        self._zero_requested = False
 
     @staticmethod
     def wl_to_bytes(wl):
@@ -31,6 +33,25 @@ class CM112(Device):
     def home(self):
         self.query(255,255,255)
 
+    @property   
+    def zero(self):
+        if self._zero_requested:
+            self._zero_requested = False
+            return self.query(52, 1)
+        self._zero_requested = True
+        return "Ready to zero, call again to confirm."
+        
+    @property   
+    def calibrate(self):
+        pass
+    
+    @calibrate.setter
+    def calibrate(self, wl):
+        high, low = self.wl_to_bytes(wl)
+        self.query(18, high, low)
+        time.sleep(0.1)
+        return self.wavelength
+        
     @property
     def wavelength(self):
         h, l, *_ = self.query(56, 0)
@@ -64,7 +85,51 @@ class CM112(Device):
                 time.sleep(2)
             except:
                 pass
-            
+
+    @property
+    def increment(self):
+        return self.query(7)
+
+    @increment.setter
+    def increment(self, val):
+        if not isinstance(val, int):
+            return
+        for _ in range(val):
+            _ = self.increment
+
+    @property
+    def increment_m2(self):
+        return self.query(8)
+
+    @increment_m2.setter
+    def increment_m2(self, val):
+        if not isinstance(val, int):
+            return
+        for _ in range(val):
+            _ = self.increment_m2
+        
+    @property
+    def decrement(self):
+        return self.query(1)
+
+    @decrement.setter
+    def decrement(self, val):
+        if not isinstance(val, int):
+            return
+        for _ in range(val):
+            _ = self.decrement
+
+    @property
+    def decrement_m2(self):
+        return self.query(2)
+
+    @decrement.setter
+    def decrement_m2(self, val):
+        if not isinstance(val, int):
+            return
+        for _ in range(val):
+            _ = self.decrement_m2
+
     @property
     def port(self):
         return self._port
