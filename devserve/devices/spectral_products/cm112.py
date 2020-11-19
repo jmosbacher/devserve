@@ -6,7 +6,7 @@ from ..device import Device
 
 class CM112(Device):
     public = [ 'grating', 'wavelength', 'port', "zero", "calibrate",
-                  "increment", "decrement", "increment_m2", "decrement_m2" ]
+               "increment_m1", "decrement_m1", "increment_m2", "decrement_m2"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -87,11 +87,11 @@ class CM112(Device):
                 pass
 
     @property
-    def increment(self):
+    def increment_m1(self):
         return self.query(7)
 
-    @increment.setter
-    def increment(self, val):
+    @increment_m1.setter
+    def increment_m1(self, val):
         if not isinstance(val, int):
             return
         for _ in range(val):
@@ -109,11 +109,11 @@ class CM112(Device):
             _ = self.increment_m2
         
     @property
-    def decrement(self):
+    def decrement_m1(self):
         return self.query(1)
 
-    @decrement.setter
-    def decrement(self, val):
+    @decrement_m1.setter
+    def decrement_m1(self, val):
         if not isinstance(val, int):
             return
         for _ in range(val):
