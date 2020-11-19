@@ -7,7 +7,7 @@ from ..device import Device
 class CM112(Device):
     public = [ 'grating', 'wavelength', 'port', "zero", "calibrate",
                "increment_m1", "decrement_m1", "increment_m2", "decrement_m2",
-               "step_size", "step"]
+               "step_size", "step", "ping"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -147,6 +147,15 @@ class CM112(Device):
     def step(self, n):
         for _ in range(n):
             _ = self.step
+
+    @property
+    def ping(self):
+        response = -1
+        try:
+            response = self.query(27)[0]
+        except:
+            pass
+        return response == 27, response
 
     @property
     def port(self):
