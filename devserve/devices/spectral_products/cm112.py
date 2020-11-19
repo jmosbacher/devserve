@@ -6,7 +6,8 @@ from ..device import Device
 
 class CM112(Device):
     public = [ 'grating', 'wavelength', 'port', "zero", "calibrate",
-               "increment_m1", "decrement_m1", "increment_m2", "decrement_m2"]
+               "increment_m1", "decrement_m1", "increment_m2", "decrement_m2",
+               "step_size", "step"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -129,6 +130,23 @@ class CM112(Device):
             return
         for _ in range(val):
             _ = self.decrement_m2
+
+    @property
+    def step_size(self):
+        return self.query(56, 6)
+
+    @step_size.setter
+    def step_size(self, value):
+        return self.query(55, value)
+
+    @property
+    def step(self):
+        return self.query(54)
+
+    @step.setter
+    def step(self, n):
+        for _ in range(n):
+            _ = self.step
 
     @property
     def port(self):
