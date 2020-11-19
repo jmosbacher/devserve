@@ -6,7 +6,8 @@ from ..device import Device
 
 class CM112(Device):
     public = [ 'grating', 'wavelength', 'port', "zero", "calibrate",
-                  "increment", "decrement", "increment_m2", "decrement_m2" ]
+               "increment_m1", "decrement_m1", "increment_m2", "decrement_m2",
+               "step_size", "step", "ping"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -87,11 +88,11 @@ class CM112(Device):
                 pass
 
     @property
-    def increment(self):
+    def increment_m1(self):
         return self.query(7)
 
-    @increment.setter
-    def increment(self, val):
+    @increment_m1.setter
+    def increment_m1(self, val):
         if not isinstance(val, int):
             return
         for _ in range(val):
@@ -109,11 +110,11 @@ class CM112(Device):
             _ = self.increment_m2
         
     @property
-    def decrement(self):
+    def decrement_m1(self):
         return self.query(1)
 
-    @decrement.setter
-    def decrement(self, val):
+    @decrement_m1.setter
+    def decrement_m1(self, val):
         if not isinstance(val, int):
             return
         for _ in range(val):
@@ -129,6 +130,32 @@ class CM112(Device):
             return
         for _ in range(val):
             _ = self.decrement_m2
+
+    @property
+    def step_size(self):
+        return self.query(56, 6)
+
+    @step_size.setter
+    def step_size(self, value):
+        return self.query(55, value)
+
+    @property
+    def step(self):
+        return self.query(54)
+
+    @step.setter
+    def step(self, n):
+        for _ in range(n):
+            _ = self.step
+
+    @property
+    def ping(self):
+        response = -1
+        try:
+            response = self.query(27)[0]
+        except:
+            pass
+        return response == 27, response
 
     @property
     def port(self):
