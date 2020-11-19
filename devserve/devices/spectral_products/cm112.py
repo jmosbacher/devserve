@@ -96,7 +96,7 @@ class CM112(Device):
         if not isinstance(val, int):
             return
         for _ in range(val):
-            _ = self.increment
+            _ = self.increment_m1
 
     @property
     def increment_m2(self):
@@ -118,13 +118,13 @@ class CM112(Device):
         if not isinstance(val, int):
             return
         for _ in range(val):
-            _ = self.decrement
+            _ = self.decrement_m1
 
     @property
     def decrement_m2(self):
         return self.query(2)
 
-    @decrement.setter
+    @decrement_m2.setter
     def decrement_m2(self, val):
         if not isinstance(val, int):
             return
