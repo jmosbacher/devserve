@@ -10,7 +10,7 @@ class FirmataBoard(Device):
 
         self._dpins = [f'digital{x}' for x in range(14)]
         self._apins = [f'analog{x}' for x in range(6)]
-        
+
     @property
     def port(self):
         return self._port
@@ -54,7 +54,7 @@ class FirmataBoard(Device):
 
 
 class FirmataDigitalPin(Device):
-    public = ['port', 'board', 'pin', 'on']
+    public = ['port', 'board', 'pin', 'on', 'control', 'control_pin']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -62,6 +62,9 @@ class FirmataDigitalPin(Device):
         self._board_type = kwargs.get('board', 'Arduino')
         self._pin = kwargs.get('pin', 13)
         self._board = None
+
+        self._control_pin = kwargs.get('control_pin', 12)
+        self._control     = kwargs.get("control", "camera")
 
     @property
     def port(self):
@@ -90,17 +93,44 @@ class FirmataDigitalPin(Device):
     def pin(self, value):
         if value in range(14):
             self._pin = value
-        
+
+    @property
+    def control_pin(self):
+        return self._control_pin
+
+    @control_pin.setter
+    def control_pin(self, value):
+        if value not in range(14):
+            raise ValueError("Invalid pin value. Must be in range(14)")
+        self._control_pin = value
+
     @property
     def on(self):
-        return self._board.digital[self._pin].read()
+        return self._board.digital[self._pin].read() if self.control == "computer" else None
 
     @on.setter
     def on(self, value):
+        if self.control == "camera":
+            print("Warning! Attempted to set value while delegating device control. Action not performed.")
+            return
+
         if value in ['on', 1, True]:
             self._board.digital[self._pin].write(1)
         elif value in ['off', 0, False]:
             self._board.digital[self._pin].write(0)
+
+    @property
+    def control(self):
+        return self._control
+
+    @control.setter
+    def control(self, value):
+        value = value.lower()
+        if value not in "computer camera".split():
+            raise ValueError("Invalid control option. Must be either 'computer' or 'camera'")
+
+        self._control = value
+        self._board.digital[self._control_pin].write(int(value == "camera"))
 
     @property
     def connected(self):
@@ -114,6 +144,10 @@ class FirmataDigitalPin(Device):
             import pyfirmata
             self._board = getattr(pyfirmata,self._board_type)(self._port)
             self.connected = True
+
+            self.control_pin = self._control_pin
+            self.control     = self._control
+
         except:
             pass
 
