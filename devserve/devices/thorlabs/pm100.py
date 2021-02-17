@@ -96,6 +96,9 @@ class PM100(Device):
         except:
             pass
 
+    def disconnect(self):
+        pass
+
     @property
     def connected(self):
         if self.pm is not None:
