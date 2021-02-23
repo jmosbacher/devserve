@@ -24,7 +24,7 @@ class Status(Enum):
     moving_down = b'*\x04\x06\x00\x81P\x01\x00\x10\x00\x00\x90'
     moving_up = b'*\x04\x06\x00\x81P\x01\x00\x13\x00\x00\x90'
     query = b"\x29\x04\x00\x00\x21\x01"
-    
+
 class MFF101(Device):
     public = ['position', 'info', 'port']
     # Raw byte commands for "MGMSG_MOT_MOVE_JOG".
@@ -49,7 +49,7 @@ class MFF101(Device):
 
     @port.setter
     def port(self, value):
-        self._port = value
+        self._port = str(value).encode()
         if self.connected:
             self.disconnect()
         try:
