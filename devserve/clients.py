@@ -172,16 +172,18 @@ class SystemClient:
 
     def validate_device_connections(self):
         for device_name, device in self.devices.items():
+            print(f"Checking {device_name}... ", end="", flush=True)
             try:
                 if not device.connected:
                     # Try to reconnect again
                     device.port = device.port
-                if not device.connected:
-                    # Give up
-                    print(f"Device {device_name} is not connected")
+                    time.sleep(0.5)
             except ConnectionError:
                 print(f"Device {device_name} does not respond. Check the connection.")
                 raise
+            finally:
+                print("OK" if device.connected else "FAIL")
+
 
     @classmethod
     def from_json_file(cls, host ,path: str):
